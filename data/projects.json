@@ -1,0 +1,184 @@
+{
+  "p-aag-launch": {
+    "name": "Channel Incentive Program Launch",
+    "start": "2026-11-06",
+    "tasks": [
+      {
+        "id": "4s2828jwyps4",
+        "name": "Program Strategy & Architecture",
+        "level": 0,
+        "dur": 1,
+        "start": "2026-11-06",
+        "due": "2026-11-16",
+        "pct": 0,
+        "owner": "",
+        "preds": [],
+        "notes": "Phase 1: Commercial alignment and behavioural incentive design.",
+        "collapsed": true
+      },
+      {
+        "id": "6349e1jh0x4t",
+        "name": "Stakeholder discovery & commercial targets",
+        "level": 1,
+        "dur": 4,
+        "start": "2026-11-06",
+        "due": null,
+        "pct": 100,
+        "owner": "Andrew Solomon",
+        "preds": [],
+        "notes": "Define KPIs, participant segments and baseline performance metrics."
+      },
+      {
+        "id": "h1dog1beivq1",
+        "name": "Behavioural diagnostic & incentive architecture",
+        "level": 1,
+        "dur": 5,
+        "start": "2026-11-06",
+        "due": null,
+        "pct": 100,
+        "owner": "Dr. Preeya Daya",
+        "preds": [
+          {
+            "id": "6349e1jh0x4t",
+            "lag": 0
+          }
+        ],
+        "notes": "Structure earning mechanics, tier thresholds and recognition cadences."
+      },
+      {
+        "id": "sri8y2tpa2ph",
+        "name": "Executive sign-off on program mechanics",
+        "level": 1,
+        "dur": 0,
+        "start": "2026-11-06",
+        "due": null,
+        "pct": 100,
+        "owner": "Dane Amyot",
+        "preds": [
+          {
+            "id": "h1dog1beivq1",
+            "lag": 0
+          }
+        ],
+        "notes": "Formal approval of budget and commercial rules."
+      },
+      {
+        "id": "c18aspop4um3",
+        "name": "Platform, Data & Creative Build",
+        "level": 0,
+        "dur": 1,
+        "start": "2026-11-06",
+        "due": null,
+        "pct": 0,
+        "owner": "",
+        "preds": [],
+        "notes": "Phase 2: Brand Studio collateral and platform rules engine."
+      },
+      {
+        "id": "el36m6shy1j1",
+        "name": "Brand identity & campaign launch collateral",
+        "level": 1,
+        "dur": 2,
+        "start": "2026-11-13",
+        "due": "2026-11-30",
+        "pct": 75,
+        "owner": "Brand Studio",
+        "preds": [
+          {
+            "id": "sri8y2tpa2ph",
+            "lag": 0
+          }
+        ],
+        "notes": "Apply Achievement Awards Group brand guidelines and Clear Blue imagery."
+      },
+      {
+        "id": "a64nqbazdnep",
+        "name": "Platform configuration & reward rules engine",
+        "level": 1,
+        "dur": 8,
+        "start": "2026-11-06",
+        "due": null,
+        "pct": 60,
+        "owner": "JC Latter",
+        "preds": [
+          {
+            "id": "sri8y2tpa2ph",
+            "lag": 0
+          }
+        ],
+        "notes": "Configure points calculation, leaderboards and digital catalogue."
+      },
+      {
+        "id": "v67lbe9csw9e",
+        "name": "Partner data feed & SSO integration",
+        "level": 1,
+        "dur": 5,
+        "start": "2026-11-13",
+        "due": null,
+        "pct": 40,
+        "owner": "Data Lab",
+        "preds": [
+          {
+            "id": "a64nqbazdnep",
+            "lag": -2
+          }
+        ],
+        "notes": "Automated sales feed ingestion and participant authentication."
+      },
+      {
+        "id": "ohawgzstv6wa",
+        "name": "End-to-end UAT & fulfilment verification",
+        "level": 1,
+        "dur": 4,
+        "start": "2026-11-06",
+        "due": null,
+        "pct": 0,
+        "owner": "QA Team",
+        "preds": [
+          {
+            "id": "el36m6shy1j1",
+            "lag": 0
+          },
+          {
+            "id": "v67lbe9csw9e",
+            "lag": 0
+          }
+        ],
+        "notes": "Verify points issuance, statements and reward redemption."
+      },
+      {
+        "id": "x9p0867k68xb",
+        "name": "Field Enablement & Go-Live",
+        "level": 0,
+        "dur": 1,
+        "start": "2026-11-06",
+        "due": null,
+        "pct": 0,
+        "owner": "",
+        "preds": [],
+        "notes": "Phase 3: Regional briefings and national launch."
+      },
+      {
+        "id": "msg35dj93amq",
+        "name": "National Program Go-Live",
+        "level": 1,
+        "dur": 0,
+        "start": "2026-11-06",
+        "due": null,
+        "pct": 0,
+        "owner": "Andrew Solomon",
+        "preds": [
+          {
+            "id": "ohawgzstv6wa",
+            "lag": 0
+          }
+        ],
+        "notes": "Official launch across all participating channels."
+      }
+    ],
+    "rev": 7,
+    "savedBy": "s3l9rvwqrdgs",
+    "updatedAt": 1794555161599,
+    "format": "critical-path/1"
+  }
+}

@@ -1,27 +1,25 @@
-# Critical Path
+# Critical Path · Achievement Awards Group
 
-A project planner with tasks and indented subtasks, durations, start, finish and due dates,
-% complete, responsible people, predecessors, critical path and a live Gantt chart.
+A branded project and program planner with tasks and indented subtasks, durations, start, finish and due dates, `% complete`, responsible people, predecessors, critical path, and a live interactive Gantt chart.
 
-## What's in this folder
+## Brand Identity (`aagroup.co.za/brand`)
 
-- `index.html` — the whole app: page, styles and code in one file. No build step and nothing to install.
+Styled according to the **Achievement Awards Group Brand Hub**:
+- **Core Palette**: Core White (`#EFEFEF`), Secondary Blue (`#0A162E`), Primary Blue (`#21409A`), Black (`#181818`), and Grey (`#939598`).
+- **Functional Accents**: Lime (`#ACD253`) for completion progress, Cyan (`#59B0C4`) for focus and interactive cues, Orange (`#FBAB18`) for the Today marker, and Magenta (`#BB1D5E`) / Pink (`#E8909A`) for critical path and overdue tasks.
+- **Typography**: `Archivo` (`"Archivo", "Aptos", Arial, sans-serif`) for headings, data tables, and UI controls.
+- **Approved Assets**: Supplied Achievement Awards Group logos and symbol (`assets/brand/`).
 
-## Run it
+## Persistent Database Architecture
 
-- Open `index.html` in any browser, or
-- In Antigravity (or VS Code), open this folder and start any static preview / live server.
+Projects are automatically persisted across three synchronized tiers:
+1. **Server Database (`/api/projects` & `/api/projects/stream`)**: Backed by `data/projects.json` via `server.js` with real-time Server-Sent Events (SSE) synchronization across open browser tabs and clients.
+2. **Browser IndexedDB (`CriticalPathDB`) & LocalStorage**: Every project change is mirrored in IndexedDB for instant offline durability and cross-tab sync via `BroadcastChannel`.
+3. **Optional Cloud Database Endpoint**: Click the **Saved / Synced · DB** pill in the top header (or open **⋯ → Database & sync…**) to connect a Firebase Realtime Database URL or custom REST endpoint for external serverless deployments.
 
-## Where projects are saved
+## Run Locally
 
-Outside Claude, projects are saved in the browser's local storage. That means each person
-and each device has its own projects. Use **⋯ → Export** (Microsoft Project XML, CSV or
-JSON backup) and **⋯ → Import from file** to move plans between devices.
-
-To give a team one shared set of projects, the save/load code (search for `persistence`
-in `index.html`) needs to be connected to a database such as Supabase or Firebase.
-
-## Deploy
-
-Push this folder to a GitHub repository and import it in Vercel as a static site
-(Framework preset: "Other", no build command, output directory: `.`).
+```bash
+npm run dev
+# Opens http://localhost:3000 with full database persistence
+```
