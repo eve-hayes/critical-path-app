@@ -51,3 +51,4 @@ scratch*
 serveo*
 *.log
 
+.vercel

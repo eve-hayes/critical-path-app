@@ -1977,6 +1977,17 @@ async function createPersistentDB(){
   }
 
   if(!useRemoteURL&&!useServerAPI){
+    try{
+      const sr=await fetch('data/projects.json',{cache:'no-store'});
+      if(sr.ok){
+        const sdata=await sr.json();
+        if(sdata&&typeof sdata==='object'){
+          for(const[k,v]of Object.entries(sdata)){
+            if(v&&typeof v==='object'&&(!merged[k]||(v.updatedAt||0)>(merged[k].updatedAt||0))){merged[k]=v;await idbPut(idb,k,v);}
+          }
+        }
+      }
+    }catch(e){}
     S.dbTier='IndexedDB + Browser Storage';
   }
 

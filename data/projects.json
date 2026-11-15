@@ -50,6 +50,7 @@
         "name": "Executive sign-off on program mechanics",
         "level": 1,
         "dur": 0,
+        "milestone": true,
         "start": "2026-11-06",
         "due": null,
         "pct": 100,
@@ -163,6 +164,7 @@
         "name": "National Program Go-Live",
         "level": 1,
         "dur": 0,
+        "milestone": true,
         "start": "2026-11-06",
         "due": null,
         "pct": 0,
@@ -174,11 +176,26 @@
           }
         ],
         "notes": "Official launch across all participating channels."
+      },
+      {
+        "id": "yzffs9d6lp0z",
+        "name": "Go no go",
+        "level": 2,
+        "dur": 0,
+        "milestone": true,
+        "pinDate": true,
+        "start": "2026-11-06",
+        "due": null,
+        "pct": 0,
+        "owner": "",
+        "preds": [],
+        "notes": "",
+        "attachments": []
       }
     ],
-    "rev": 7,
-    "savedBy": "s3l9rvwqrdgs",
-    "updatedAt": 1794555161599,
+    "rev": 12,
+    "savedBy": "jw9t7jdhpg42",
+    "updatedAt": 1794753370452,
     "format": "critical-path/1"
   }
 }
