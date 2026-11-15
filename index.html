@@ -163,13 +163,35 @@ button,input,select,textarea{font:inherit;color:inherit}
 .c-ind{justify-content:center;gap:1px;padding:0 2px}
 .c-ind .ic{width:13px;height:13px}
 .i-bad{color:var(--bad)}.i-ok{color:var(--ok)}.i-note{color:var(--faint)}
-.c-name{padding-left:calc(4px + var(--lvl) * 18px);gap:2px}
+.c-name{padding-left:calc(4px + var(--lvl) * 16px);gap:4px}
+.wbs{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--faint);background:var(--surface-2);border:1px solid var(--line);border-radius:4px;padding:0 4px;line-height:16px;flex:none;user-select:none}
+.row.sum .wbs{color:var(--accent);border-color:var(--accent-soft);background:var(--accent-soft)}
+.ms-badge{border:0;background:transparent;padding:0 2px;cursor:pointer;color:var(--accent);font-size:12px;line-height:1;flex:none;display:inline-flex;align-items:center;justify-content:center;border-radius:4px}
+.ms-badge:hover{background:var(--accent-soft)}
+.row.crit .ms-badge{color:var(--crit)}
+.ms-dur{display:inline-flex;align-items:center;gap:4px;font-weight:600;color:var(--accent);font-size:11.5px}
+.row.crit .ms-dur{color:var(--crit)}
+.c-att{justify-content:center;padding:0 3px}
+.att-btn{display:inline-flex;align-items:center;justify-content:center;gap:3px;height:22px;min-width:26px;padding:0 5px;border:1px solid transparent;background:transparent;border-radius:5px;cursor:pointer;color:var(--faint);font-size:11px;font-weight:600}
+.att-btn:hover{background:var(--surface-2);border-color:var(--line-strong);color:var(--fg)}
+.att-btn.has-att{background:var(--accent-soft);border-color:rgba(33,64,154,.25);color:var(--accent)}
+.att-btn .ic{width:13.5px;height:13.5px}
+.att-list{display:flex;flex-direction:column;gap:6px;max-height:240px;overflow:auto}
+.att-item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 10px;border:1px solid var(--line);border-radius:7px;background:var(--surface-2);font-size:12.5px}
+.att-item-info{display:flex;align-items:center;gap:8px;min-width:0;flex:1}
+.att-item-name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--fg);text-decoration:none}
+.att-item-name:hover{text-decoration:underline;color:var(--accent)}
+.att-item-meta{font-size:11px;color:var(--faint);white-space:nowrap}
+.att-drop{border:1.5px dashed var(--line-strong);border-radius:8px;padding:14px;text-align:center;color:var(--muted);background:var(--surface-2);cursor:pointer;transition:border-color .15s,background .15s}
+.att-drop:hover,.att-drop.dragover{border-color:var(--accent);background:var(--hover);color:var(--fg)}
 .caret{width:18px;height:18px;border:0;background:transparent;padding:0;display:grid;place-items:center;cursor:pointer;color:var(--muted);flex:none;border-radius:4px}
 .caret:hover{background:var(--line)}
 .caret .ic{width:12px;height:12px;stroke-width:2;transition:transform .15s}
 .caret[aria-expanded="false"] .ic{transform:rotate(-90deg)}
 .nocaret{width:18px;flex:none}
 .row.sum .c{font-weight:700}
+.row.sum.lvl-0 .c{background:var(--surface-2)}
+.row.ms-row .c-name .in{font-weight:600}
 .row.crit .c-name .in{color:var(--crit);font-weight:600}
 .in{width:100%;min-width:0;border:0;background:transparent;padding:4px 3px;border-radius:4px;height:24px}
 .in:focus{outline:2px solid var(--accent);background:var(--surface);outline-offset:0}
@@ -217,12 +239,17 @@ button,input,select,textarea{font:inherit;color:inherit}
 .bar .hd{fill:transparent;cursor:ew-resize}
 .bar[data-drag],.ms[data-drag]{cursor:grab;touch-action:none}
 .bar.dragging,.ms.dragging{cursor:grabbing;opacity:.85}
-.bar.sel .tr,.ms.sel path{stroke:var(--fg);stroke-width:1.5}
+.bar.sel .tr,.ms.sel path.ms-dia{stroke:var(--fg);stroke-width:2}
 .sumb{fill:var(--sum)}
 .sumb.crit{fill:var(--crit)}
-.ms path{fill:var(--ms)}
-.ms.crit path{fill:var(--crit)}
+.ms path.ms-dia{fill:var(--accent);stroke:#FFFFFF;stroke-width:1.5}
+.ms.crit path.ms-dia{fill:var(--crit);stroke:#FFFFFF;stroke-width:1.5}
+.ms path.ms-halo{fill:rgba(33,64,154,.16)}
+.ms.crit path.ms-halo{fill:rgba(187,29,94,.18)}
+.ms-line{stroke:var(--accent);stroke-width:1;stroke-dasharray:2 2;opacity:.45}
+.ms.crit .ms-line{stroke:var(--crit)}
 .lbl-t{fill:var(--muted);font-size:11.5px}
+.lbl-ms{fill:var(--fg);font-size:11.5px;font-weight:700}
 .lnk{fill:none;stroke:var(--link);stroke-width:1.2}
 .lnk.crit{stroke:var(--crit)}
 .arr{fill:var(--link)}
@@ -338,6 +365,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 </div>
 <aside class="drawer" id="drawer" hidden aria-label="Task details"></aside>
 <input type="file" id="fileIn" accept=".xlsx,.json,.csv,.xml,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/json,text/csv,text/xml" hidden>
+<input type="file" id="attIn" multiple hidden>
 
 <script>
 (function(){
@@ -387,35 +415,39 @@ const ICON={
  split:'M2.5 3h11v10h-11zM7 3v10', sheet:'M2.5 3h11v10h-11zM2.5 6.5h11M2.5 10h11', gantt:'M3 4h6M5 8h7M8 12h5',
  key:'M2 5h12v7H2zM4.5 7.5h1M7.5 7.5h1M10.5 7.5h1M5 10h6', pen:'M10.5 2.5l3 3-8 8h-3v-3z',
  xlsx:'M2.5 2.5h11v11h-11zM2.5 6h11M2.5 9.5h11M6.5 2.5v11',
- pdf:'M3.5 2h6l3 3v9h-9zM9.5 2v3h3M5.5 8.5h5M5.5 11h3.5'
+ pdf:'M3.5 2h6l3 3v9h-9zM9.5 2v3h3M5.5 8.5h5M5.5 11h3.5',
+ clip:'M10.5 4.5 5.2 9.8a1.5 1.5 0 0 0 2.1 2.1l6-6a3 3 0 0 0-4.2-4.2l-6.2 6.2a4.5 4.5 0 0 0 6.4 6.4l5.2-5.2'
 };
 const ic=k=>`<svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="${ICON[k]}"/></svg>`;
 const icc=(k,c)=>`<svg class="ic ${c}" viewBox="0 0 16 16" aria-hidden="true"><path d="${ICON[k]}"/></svg>`;
 
 /* ---------------- state ---------------- */
+const MAX_LEVEL=5;
 const isNarrow=()=>window.innerWidth<700;
 const S={
   mode:'loading', db:null, dl:null, projects:{}, curId:null, P:null, sc:null,
   sel:new Set(), anchor:null, undo:[], redo:[], canWrite:true, dirty:false, lastRemote:null,
-  view:lsGet('cp.view2',null)||(window.innerWidth<1000?'sheet':'split'), zoom:lsGet('cp.zoom','week'),
+  view:lsGet('cp.view2',null)||(window.innerWidth<700?'sheet':'split'), zoom:lsGet('cp.zoom','week'),
   hidden:new Set(lsGet('cp.hidden',[])), critical:lsGet('cp.crit',false), owner:'', q:'',
-  drawer:false, pendingFocus:null, pendingRemote:false, loaded:false, g:null
+  drawer:false, pendingFocus:null, pendingRemote:false, loaded:false, g:null, attTaskId:null
 };
 
 const COLS=[
  {k:'id',label:'#',w:34,fixed:true},
- {k:'ind',label:'',w:24,fixed:true,title:'Indicators'},
- {k:'name',label:'Task name',w:230,fixed:true},
- {k:'dur',label:'Duration',w:66},
+ {k:'ind',label:'',w:26,fixed:true,title:'Indicators'},
+ {k:'name',label:'Task name',w:245,fixed:true},
+ {k:'att',label:'Files',w:54,title:'Attached documents'},
+ {k:'dur',label:'Duration',w:72},
  {k:'start',label:'Start',w:112},
  {k:'finish',label:'Finish',w:112},
  {k:'due',label:'Due date',w:112},
- {k:'pct',label:'% Done',w:102},
- {k:'owner',label:'Responsible',w:122},
- {k:'preds',label:'Predecessors',w:92},
- {k:'status',label:'Status',w:98}
+ {k:'pct',label:'% Done',w:98},
+ {k:'owner',label:'Responsible',w:120},
+ {k:'preds',label:'Predecessors',w:86},
+ {k:'status',label:'Status',w:96},
+ {k:'notes',label:'Comments',w:190}
 ];
-const nameW=()=>isNarrow()?150:(window.innerWidth<1300?190:230);
+const nameW=()=>isNarrow()?155:(window.innerWidth<1300?205:245);
 const colW=c=>c.k==='name'?nameW():c.w;
 function visibleCols(){return COLS.filter(c=>c.fixed||(S.view!=='gantt'&&!S.hidden.has(c.k)));}
 
@@ -424,7 +456,9 @@ function subEnd(T,i){let j=i+1;while(j<T.length&&T[j].level>T[i].level)j++;retur
 function sched(P){
   const T=P.tasks,n=T.length,base=wd(pISO(P.start)??todayDN);
   const ix=new Map();T.forEach((t,i)=>ix.set(t.id,i));
-  const isSum=T.map((t,i)=>i+1<n&&T[i+1].level>t.level);
+  const isSum=T.map((t,i)=>!t.milestone&&i+1<n&&T[i+1].level>t.level);
+  const wbs=new Array(n).fill('');const cnts=[];
+  for(let i=0;i<n;i++){const lv=clamp(T[i].level||0,0,MAX_LEVEL);cnts.length=lv+1;cnts[lv]=(cnts[lv]||0)+1;for(let k=0;k<lv;k++)if(!cnts[k])cnts[k]=1;wbs[i]=cnts.join('.');}
   const par=new Array(n).fill(-1),end=new Array(n).fill(n),st=[];
   for(let i=0;i<n;i++){while(st.length&&T[st[st.length-1]].level>=T[i].level)end[st.pop()]=i;par[i]=st.length?st[st.length-1]:-1;st.push(i);}
   const Sw=new Array(n),Ew=new Array(n),flag=new Array(n).fill(0),sumF=new Array(n),sumMs=new Array(n);let cycle=false;
@@ -434,17 +468,18 @@ function sched(P){
     flag[i]=1;
     if(isSum[i]){let s=Infinity,e=-Infinity,f=-Infinity,allMs=true;for(let k=i+1;k<end[i];k++){if(isSum[k])continue;calc(k);const d=T[k].dur||0;if(d)allMs=false;if(Sw[k]<s)s=Sw[k];if(Ew[k]>e)e=Ew[k];const fk=d?Sw[k]+d-1:Sw[k];if(fk>f)f=fk;}
       if(!isFinite(s)){s=base;e=base;f=base;}Sw[i]=s;Ew[i]=Math.max(e,s);sumF[i]=f;sumMs[i]=allMs;}
-    else{const t=T[i];let s=pISO(t.start)!=null?wd(pISO(t.start)):base;let m=-Infinity;
-      for(const[j,lag]of effPreds(i)){if(calc(j))m=Math.max(m,Ew[j]+lag);}
-      if(m>-Infinity)s=Math.max(s,m);Sw[i]=s;Ew[i]=s+(t.dur||0);}
+    else{const t=T[i];const isMs=t.milestone||(t.dur||0)===0;
+      let s=pISO(t.start)!=null?wd(pISO(t.start)):base;let m=-Infinity;
+      if(!(isMs&&t.pinDate)){for(const[j,lag]of effPreds(i)){if(calc(j))m=Math.max(m,Ew[j]+lag);}}
+      if(m>-Infinity)s=Math.max(s,m);Sw[i]=s;Ew[i]=s+(isMs?0:(t.dur||0));}
     flag[i]=2;return true;
   }
   for(let i=0;i<n;i++)calc(i);
   const Fw=new Array(n),dur=new Array(n),pct=new Array(n);
-  for(let i=0;i<n;i++){if(isSum[i]){Fw[i]=sumF[i];dur[i]=sumMs[i]?0:Fw[i]-Sw[i]+1;}else{dur[i]=T[i].dur||0;Fw[i]=dur[i]?Sw[i]+dur[i]-1:Sw[i];}}
+  for(let i=0;i<n;i++){if(isSum[i]){Fw[i]=sumF[i];dur[i]=sumMs[i]?0:Fw[i]-Sw[i]+1;}else{const isMs=T[i].milestone||(T[i].dur||0)===0;dur[i]=isMs?0:(T[i].dur||0);Fw[i]=dur[i]?Sw[i]+dur[i]-1:Sw[i];}}
   for(let i=0;i<n;i++){
     if(!isSum[i]){pct[i]=clamp(T[i].pct||0,0,100);continue;}
-    let w=0,pw=0,c=0,ps=0;for(let k=i+1;k<end[i];k++){if(isSum[k])continue;const d=T[k].dur||0,p=clamp(T[k].pct||0,0,100);w+=d;pw+=d*p;c++;ps+=p;}
+    let w=0,pw=0,c=0,ps=0;for(let k=i+1;k<end[i];k++){if(isSum[k])continue;const d=dur[k]||0,p=clamp(T[k].pct||0,0,100);w+=d;pw+=d*p;c++;ps+=p;}
     pct[i]=Math.round(w?pw/w:(c?ps/c:0));
   }
   // backward pass for total slack (leaves only)
@@ -452,12 +487,13 @@ function sched(P){
   const succ=Array.from({length:n},()=>[]);
   for(let j=0;j<n;j++){if(isSum[j])continue;for(const[k,lag]of effPreds(j)){if(isSum[k]){for(let l=k+1;l<end[k];l++)if(!isSum[l])succ[l].push([j,lag]);}else succ[k].push([j,lag]);}}
   const LS=new Array(n),fl2=new Array(n).fill(0);
-  function late(i){if(fl2[i]===2)return LS[i];if(fl2[i]===1)return Sw[i];fl2[i]=1;let le=projE;for(const[j,lag]of succ[i])le=Math.min(le,late(j)-lag);LS[i]=le-(T[i].dur||0);fl2[i]=2;return LS[i];}
+  function late(i){if(fl2[i]===2)return LS[i];if(fl2[i]===1)return Sw[i];fl2[i]=1;let le=projE;for(const[j,lag]of succ[i])le=Math.min(le,late(j)-lag);LS[i]=le-(dur[i]||0);fl2[i]=2;return LS[i];}
   const slack=new Array(n).fill(0),crit=new Array(n).fill(false);
   for(let i=0;i<n;i++){if(isSum[i])continue;slack[i]=late(i)-Sw[i];crit[i]=slack[i]<=0;}
   for(let i=n-1;i>=0;i--){if(isSum[i]){for(let k=i+1;k<end[i];k++)if(crit[k]){crit[i]=true;break;}}}
-  const sDN=Sw.map(dnOf),fDN=Fw.map(dnOf);
-  return{T,n,ix,isSum,par,end,Sw,Ew,Fw,dur,pct,slack,crit,sDN,fDN,cycle};
+  const sDN=Sw.map((w0,i)=>{const t=T[i];if(!isSum[i]&&(t.milestone||dur[i]===0)&&t.pinDate&&pISO(t.start)!=null)return pISO(t.start);return dnOf(w0);});
+  const fDN=Fw.map((w0,i)=>{const t=T[i];if(!isSum[i]&&(t.milestone||dur[i]===0)&&t.pinDate&&pISO(t.start)!=null)return pISO(t.start);return dnOf(w0);});
+  return{T,n,ix,isSum,wbs,par,end,Sw,Ew,Fw,dur,pct,slack,crit,sDN,fDN,cycle};
 }
 function statusOf(sc,i){
   const p=sc.pct[i];if(p>=100)return['Complete','done'];
@@ -509,7 +545,7 @@ async function flush(){
   setStat('saving','Saving…');
   try{
     if(S.mode==='db'){
-      if(JSON.stringify(body).length>250000){toast('This project is too large to save online. Split it into smaller projects or export it.');throw{code:'too_big'};}
+      if(JSON.stringify(body).length>25000000){toast('This project is too large to save online. Remove large attachments or export it.');throw{code:'too_big'};}
       await writeDoc(id,body);setStat('ok','Saved');
     }else{S.projects[id]=body;saveLocal();setStat('local','Saved in this browser');}
   }catch(e){
@@ -589,33 +625,97 @@ function redo(){if(!S.redo.length||!S.canWrite)return;S.undo.push(snapP());resto
 
 function taskIdx(id){return S.P.tasks.findIndex(t=>t.id===id);}
 function selIdx(){return[...S.sel].map(taskIdx).filter(i=>i>=0).sort((a,b)=>a-b);}
-function newTask(o){return Object.assign({id:uid(),name:'New task',level:0,dur:1,start:S.P.start,due:null,pct:0,owner:'',preds:[],notes:''},o);}
+function newTask(o){return Object.assign({id:uid(),name:'New task',level:0,dur:1,milestone:false,pinDate:false,start:S.P.start,due:null,pct:0,owner:'',preds:[],notes:'',attachments:[]},o);}
+function fmtBytes(b){if(!b||b<1024)return(b||0)+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(1)+' MB';}
 
 function setField(id,f,v){
   if(!S.P)return;const i=taskIdx(id);if(i<0)return;const t=S.P.tasks[i],sc=S.sc,sum=sc&&sc.isSum[i];
+  const isMs=!sum&&(t.milestone||(t.dur||0)===0);
   switch(f){
     case'name':v=String(v).trim()||'Untitled task';commit(()=>{t.name=v;});break;
-    case'dur':{if(sum)return requestRender();const d=parseDur(v);if(d==null){toast('Enter a duration such as 5, 5d or 2w.');return requestRender();}commit(()=>{t.dur=d;});break;}
-    case'start':{if(sum||!v)return requestRender();const dn=pISO(v);if(dn==null)return requestRender();commit(()=>{t.start=iso(dnOf(wd(dn)));});break;}
-    case'finish':{if(sum||!v)return requestRender();const dn=pISO(v);if(dn==null)return requestRender();const fw=finWD(dn),s0=sc.Sw[i];
-      commit(()=>{if(fw>=s0)t.dur=Math.max(t.dur===0&&fw===s0?0:1,fw-s0+1);else{const d=Math.max(1,t.dur||1);t.start=iso(dnOf(fw-d+1));}});break;}
+    case'dur':{if(sum)return requestRender();const d=parseDur(v);if(d==null){toast('Enter a duration such as 5, 5d, 2w, or 0 for a milestone.');return requestRender();}
+      commit(()=>{t.dur=d;t.milestone=(d===0);if(d===0){t.pinDate=true;t.start=iso(sc.sDN[i]);}});break;}
+    case'start':{if(sum||!v)return requestRender();const dn=pISO(v);if(dn==null)return requestRender();
+      commit(()=>{if(isMs){t.start=iso(dn);t.dur=0;t.milestone=true;t.pinDate=true;}else{t.start=iso(dnOf(wd(dn)));}});
+      if(isMs)setTimeout(()=>scrollToDN(dn),30);break;}
+    case'finish':{if(sum||!v)return requestRender();const dn=pISO(v);if(dn==null)return requestRender();
+      if(isMs){commit(()=>{t.start=iso(dn);t.dur=0;t.milestone=true;t.pinDate=true;});setTimeout(()=>scrollToDN(dn),30);break;}
+      const fw=finWD(dn),s0=sc.Sw[i];
+      commit(()=>{if(fw>=s0)t.dur=Math.max(1,fw-s0+1);else{const d=Math.max(1,t.dur||1);t.start=iso(dnOf(fw-d+1));}});break;}
     case'due':commit(()=>{t.due=v||null;});break;
     case'pct':{if(sum)return requestRender();const n=Math.round(parseFloat(v));if(isNaN(n))return requestRender();commit(()=>{t.pct=clamp(n,0,100);});break;}
     case'owner':commit(()=>{t.owner=String(v).trim();});break;
     case'notes':commit(()=>{t.notes=String(v);});break;
-    case'milestone':if(sum)return;commit(()=>{t.dur=v?0:Math.max(1,t.dur||1);});break;
+    case'milestone':if(sum)return;commit(()=>{const curDate=iso(sc.sDN[i]);t.milestone=!!v;t.dur=v?0:Math.max(1,t.dur||1);if(v){t.pinDate=true;t.start=curDate;}});
+      if(v)setTimeout(()=>scrollToDN(sc.sDN[i]),30);break;
     case'preds':{const r=parsePreds(v,S.P.tasks,t.id);if(r.error){toast(r.error);return requestRender();}
-      commit(()=>{const had=(t.preds||[]).length;t.preds=r.list;if(!had&&r.list.length)t.start=S.P.start;},{checkCycle:true});break;}
+      commit(()=>{const had=(t.preds||[]).length;t.preds=r.list;if(r.list.length)t.pinDate=false;if(!had&&r.list.length)t.start=S.P.start;},{checkCycle:true});break;}
   }
 }
 function insertTask(ms){
-  if(!S.P||!S.canWrite)return;const T=S.P.tasks;const sc=S.sc;const ii=selIdx();
+  if(!S.P||!S.canWrite)return;
+  if(ms){milestoneDialog();return;}
+  const T=S.P.tasks;const sc=S.sc;const ii=selIdx();
   let at=T.length,level=T.length?T[T.length-1].level:0,start=S.P.start;
   if(ii.length){const i=ii[ii.length-1];start=iso(sc.sDN[i]);
-    if(sc.isSum[i]&&!T[i].collapsed){at=i+1;level=T[i].level+1;}else{at=subEnd(T,i);level=T[i].level;}}
-  const t=newTask({name:ms?'New milestone':'New task',level,dur:ms?0:1,start});
+    if(sc.isSum[i]&&!T[i].collapsed){at=i+1;level=Math.min(MAX_LEVEL,T[i].level+1);}else{at=subEnd(T,i);level=T[i].level;}}
+  const t=newTask({name:'New task',level,dur:1,milestone:false,start});
   commit(()=>{T.splice(at,0,t);});
   S.sel=new Set([t.id]);S.anchor=t.id;S.pendingFocus={id:t.id,f:'name',select:true};
+}
+function milestoneDialog(){
+  if(!S.P||!S.canWrite)return;
+  const T=S.P.tasks,sc=S.sc,ii=selIdx();
+  let defDate=S.P.start||iso(todayDN),selTask=null,selIdx0=-1;
+  if(ii.length){
+    selIdx0=ii[ii.length-1];selTask=T[selIdx0];
+    defDate=iso(sc.fDN[selIdx0]||sc.sDN[selIdx0]||todayDN);
+  }
+  const canConvert=selTask&&!sc.isSum[selIdx0]&&!(selTask.milestone||selTask.dur===0);
+  modal(`<h3>◆ Add Milestone to Gantt Chart</h3>
+    <p>Milestones mark key target dates, sign-offs or go-live events and display as a <b>diamond shape (◆)</b> on the Gantt chart for the specified day.</p>
+    <div class="fld"><label for="ms-name">Milestone name</label><input id="ms-name" autofocus placeholder="e.g. Executive Sign-Off / Go-Live" value="New milestone"></div>
+    <div class="fld"><label for="ms-date">Specified milestone date</label><input id="ms-date" type="date" value="${esc(defDate)}"></div>
+    <div class="fld"><label for="ms-owner">Responsible (optional)</label><input id="ms-owner" list="people" placeholder="e.g. Dane Amyot" value="${esc(selTask?selTask.owner||'':'')}"></div>
+    <div class="fld"><label for="ms-notes">Comments (optional)</label><input id="ms-notes" placeholder="Add milestone comment or deliverables…"></div>
+    <div class="acts">
+      <button class="btn" type="button" data-x>Cancel</button>
+      ${canConvert?`<button class="btn" type="button" data-conv title="Turn selected Task #${selIdx0+1} into a milestone on this date">◆ Convert Task #${selIdx0+1} to Milestone</button>`:''}
+      <button class="btn primary" type="button" data-ok>◆ Add Milestone</button>
+    </div>`,s=>{
+      const nameIn=s.querySelector('#ms-name');nameIn.select();
+      const goAdd=()=>{
+        const nm=nameIn.value.trim()||'Milestone';
+        const dt=s.querySelector('#ms-date').value||defDate;
+        const own=s.querySelector('#ms-owner').value.trim();
+        const nts=s.querySelector('#ms-notes').value.trim();
+        let at=T.length,level=T.length?T[T.length-1].level:0;
+        if(ii.length){
+          const i=ii[ii.length-1];
+          if(sc.isSum[i]&&!T[i].collapsed){at=i+1;level=Math.min(MAX_LEVEL,T[i].level+1);}
+          else{at=subEnd(T,i);level=T[i].level;}
+        }
+        const t=newTask({name:nm,level,dur:0,milestone:true,pinDate:true,start:dt,owner:own,notes:nts});
+        closeModal();
+        if(S.view==='sheet'){S.view='split';lsSet('cp.view2','split');}
+        commit(()=>{T.splice(at,0,t);});
+        S.sel=new Set([t.id]);S.anchor=t.id;
+        setTimeout(()=>{const dn=pISO(dt);if(dn!=null)scrollToDN(dn);toast(`Milestone “${nm}” (◆) placed on ${fmtM(dn??todayDN)}`);},40);
+      };
+      s.querySelector('[data-x]').onclick=closeModal;
+      s.querySelector('[data-ok]').onclick=goAdd;
+      if(s.querySelector('[data-conv]')){
+        s.querySelector('[data-conv]').onclick=()=>{
+          const dt=s.querySelector('#ms-date').value||defDate;
+          const nts=s.querySelector('#ms-notes').value.trim();
+          closeModal();
+          if(S.view==='sheet'){S.view='split';lsSet('cp.view2','split');}
+          commit(()=>{selTask.milestone=true;selTask.dur=0;selTask.pinDate=true;selTask.start=dt;if(nts)selTask.notes=nts;});
+          setTimeout(()=>{const dn=pISO(dt);if(dn!=null)scrollToDN(dn);toast(`Converted “${selTask.name}” to Milestone (◆) on ${fmtM(dn??todayDN)}`);},40);
+        };
+      }
+      s.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.tagName==='INPUT'){e.preventDefault();goAdd();}});
+    });
 }
 function addFromNewRow(name){
   const T=S.P.tasks;const t=newTask({name:name.trim(),level:T.length?T[T.length-1].level:0});
@@ -629,12 +729,17 @@ function deleteSel(){
 }
 function indent(dir){
   if(!S.canWrite)return;const ii=selIdx();if(!ii.length){toast('Tap a task first, then tap '+(dir>0?'Indent':'Outdent')+'.');return;}
-  const T0=S.P.tasks;const ok=ii.some(i=>dir>0?(i>0&&T0[i].level<=T0[i-1].level):T0[i].level>0);
-  if(!ok){toast(dir>0?(ii[0]===0?"The first task can't be indented. Indent the task below a main task to make it a subtask.":'This task is already a subtask of the task above it. Add another task above it to indent further.'):'This task is already a main task.');return;}
+  const T0=S.P.tasks;
+  const ok=ii.some(i=>dir>0?(i>0&&T0[i].level<MAX_LEVEL&&T0[i].level<=T0[i-1].level+1):T0[i].level>0);
+  if(!ok){
+    toast(dir>0?(ii[0]===0?"The first task can't be indented. Indent a task below a main task to make it a subtask.":`Maximum outline depth (${MAX_LEVEL+1} levels) reached for this task.`):'This task is already at the top outline level.');
+    return;
+  }
   commit(()=>{const T=S.P.tasks;const done=new Set();
     for(const i of ii){if(done.has(i))continue;const e=subEnd(T,i);
-      if(dir>0){if(i===0||T[i].level>T[i-1].level)continue;}else if(T[i].level===0)continue;
-      for(let k=i;k<e;k++){T[k].level+=dir;done.add(k);}}
+      if(dir>0){if(i===0||T[i].level>=MAX_LEVEL||T[i].level>T[i-1].level+1)continue;if(T[i-1].milestone)T[i-1].milestone=false;}
+      else if(T[i].level===0)continue;
+      for(let k=i;k<e;k++){T[k].level=clamp(T[k].level+dir,0,MAX_LEVEL);done.add(k);}}
   });
 }
 function move(dir){
@@ -767,22 +872,27 @@ function gridCols(){const vc=visibleCols();let left=0;const lefts={};vc.forEach(
 function renderGrid(){
   const sc=S.sc,T=sc.T,{vc,lefts,frozen,tpl}=gridCols();const ro=!S.canWrite;
   const work=$('#work');work.style.setProperty('--cols',tpl);work.style.setProperty('--frozen',(frozen+1)+'px');
-  if(S.view==='split'&&!S.userLeft){const total=vc.reduce((a,c)=>a+colW(c),0)+2;work.style.setProperty('--left',Math.max(260,Math.min(total,(work.clientWidth||window.innerWidth)-300))+'px');}
+  if(S.view==='split'&&!S.userLeft){const total=vc.reduce((a,c)=>a+colW(c),0)+2;work.style.setProperty('--left',Math.max(260,Math.min(total,(work.clientWidth||window.innerWidth)-320))+'px');}
   const stk=(c,extra)=>{const st=(c.fixed?`left:${lefts[c.k]}px;`:'')+(extra||'');return(c.fixed?' stk':'')+(st?`" style="${st}`:'');};
-  $('#gridHead').innerHTML=`<div class="row" style="height:46px">${vc.map(c=>`<div class="hc${stk(c)}"${c.title?` title="${c.title}"`:''}>${esc(c.label)}</div>`).join('')}</div>`;
+  $('#gridHead').innerHTML=`<div class="row" style="height:46px">${vc.map(c=>`<div class="hc${stk(c)}"${c.title?` title="${c.title}"`:''}>${c.k==='att'?ic('clip')+'<span style="margin-left:3px">Files</span>':esc(c.label)}</div>`).join('')}</div>`;
   const rows=visibleRows();S.rows=rows;
   const dis=ro?' disabled':'';
   const html=rows.map(i=>{
-    const t=T[i],sum=sc.isSum[i],sel=S.sel.has(t.id),crit=S.critical&&sc.crit[i]&&!sum;
+    const t=T[i],sum=sc.isSum[i],isMs=!sum&&(t.milestone||sc.dur[i]===0),sel=S.sel.has(t.id),crit=S.critical&&sc.crit[i]&&!sum;
+    const atts=Array.isArray(t.attachments)?t.attachments:[];
     const cells=vc.map(c=>{
       const cls='c c-'+c.k+stk(c);
       switch(c.k){
         case'id':return`<div class="${cls}" data-act="sel" title="Select row · click again for details">${i+1}</div>`;
         case'ind':{let s='';if(missedDue(sc,i))s+=`<span title="Finishes after its due date (${fmtM(pISO(t.due))})">${icc('flag','i-bad')}</span>`;
           else if(sc.pct[i]>=100)s+=`<span title="Complete">${icc('check','i-ok')}</span>`;
-          if(t.notes)s+=`<span title="${esc(t.notes.slice(0,200))}">${icc('note','i-note')}</span>`;return`<div class="${cls}">${s}</div>`;}
-        case'name':return`<div class="${'c c-name'+stk(c,'--lvl:'+t.level)}">${sum?`<button class="caret" type="button" data-act="toggle" aria-expanded="${!t.collapsed}" aria-label="${t.collapsed?'Expand':'Collapse'} ${esc(t.name)}">${ic('chev')}</button>`:'<span class="nocaret"></span>'}<input class="in" data-f="name" value="${esc(t.name)}" aria-label="Task name"${dis}></div>`;
-        case'dur':return sum?`<div class="${cls}"><span class="ro r">${sc.dur[i]}d</span></div>`:`<div class="${cls}"><input class="in" data-f="dur" value="${(t.dur||0)}d" aria-label="Duration in working days"${dis}></div>`;
+          if(t.notes)s+=`<span title="Comment: ${esc(t.notes.slice(0,200))}">${icc('note','i-note')}</span>`;return`<div class="${cls}">${s}</div>`;}
+        case'name':return`<div class="${'c c-name'+stk(c,'--lvl:'+t.level)}">${sum?`<button class="caret" type="button" data-act="toggle" aria-expanded="${!t.collapsed}" aria-label="${t.collapsed?'Expand':'Collapse'} ${esc(t.name)}">${ic('chev')}</button>`:'<span class="nocaret"></span>'}<span class="wbs" title="Outline level ${(t.level||0)+1} (${sc.wbs[i]})">${esc(sc.wbs[i])}</span>${!sum?`<button class="ms-badge" type="button" data-act="ms-toggle" title="${isMs?'Milestone (◆ on Gantt chart) — click to switch to regular task':'Click to convert task into a Milestone (◆)'}">${isMs?'◆':'◇'}</button>`:''}<input class="in" data-f="name" value="${esc(t.name)}" aria-label="Task name"${dis}></div>`;
+        case'att':{
+          const tip=atts.length?`${atts.length} attached document${atts.length>1?'s':''}: ${atts.map(a=>a.name).join(', ')} (click to view/attach)`:'Attach document to this task';
+          return`<div class="${cls}"><button class="att-btn${atts.length?' has-att':''}" type="button" data-act="att" title="${esc(tip)}" aria-label="${esc(tip)}">${ic('clip')}${atts.length?`<span>${atts.length}</span>`:''}</button></div>`;
+        }
+        case'dur':return sum?`<div class="${cls}"><span class="ro r">${sc.dur[i]}d</span></div>`:`<div class="${cls}">${isMs?`<span class="ms-dur" title="Milestone (0 days)">◆</span>`:''}<input class="in" data-f="dur" value="${isMs?'0d':(t.dur||0)+'d'}" aria-label="Duration in working days"${dis}></div>`;
         case'start':return sum?`<div class="${cls}"><span class="ro">${fmtM(sc.sDN[i])}</span></div>`:`<div class="${cls}"><input class="in" type="date" data-f="start" value="${iso(sc.sDN[i])}" aria-label="Start"${dis}></div>`;
         case'finish':return sum?`<div class="${cls}"><span class="ro">${fmtM(sc.fDN[i])}</span></div>`:`<div class="${cls}"><input class="in" type="date" data-f="finish" value="${iso(sc.fDN[i])}" aria-label="Finish"${dis}></div>`;
         case'due':return`<div class="${cls}"><input class="in" type="date" data-f="due" value="${esc(t.due||'')}" aria-label="Due date"${dis}></div>`;
@@ -790,9 +900,10 @@ function renderGrid(){
         case'owner':return`<div class="${cls}"><input class="in" data-f="owner" list="people" value="${esc(t.owner||'')}" aria-label="Responsible"${dis}></div>`;
         case'preds':return`<div class="${cls}"><input class="in" data-f="preds" value="${esc(predsText(t,sc))}" aria-label="Predecessors" placeholder="" ${dis}></div>`;
         case'status':{const[l,k]=statusOf(sc,i);return`<div class="${cls}"><span class="pill ${k}">${l}</span></div>`;}
+        case'notes':return`<div class="${cls}"><input class="in" data-f="notes" value="${esc(t.notes||'')}" placeholder="${ro?'':'Add comment…'}" aria-label="Comments"${dis}></div>`;
       }
     }).join('');
-    return`<div class="row${sum?' sum':''}${sel?' sel':''}${crit?' crit':''}" data-id="${esc(t.id)}">${cells}</div>`;
+    return`<div class="row lvl-${t.level||0}${sum?' sum':''}${isMs?' ms-row':''}${sel?' sel':''}${crit?' crit':''}" data-id="${esc(t.id)}">${cells}</div>`;
   }).join('');
   const nr=ro?'':`<div class="row newrow">${vc.map(c=>`<div class="c c-${c.k}${stk(c)}">${c.k==='id'?ic('plus'):c.k==='name'?`<span class="nocaret"></span><input class="in" data-new placeholder="Add a task" aria-label="Add a task">`:''}</div>`).join('')}</div>`;
   $('#gridBody').innerHTML=html+nr+'<div class="spacer"></div>';
@@ -837,28 +948,28 @@ function renderGantt(){
   const tx=x(todayDN)+dw/2;g+=`<line class="today" x1="${tx}" y1="0" x2="${tx}" y2="${H}"/>`;
   // links
   const rowOf=new Map();rows.forEach((i,vi)=>rowOf.set(i,vi));
-  const isMs=i=>!sc.isSum[i]&&sc.dur[i]===0;
+  const isMs=i=>!sc.isSum[i]&&(T[i].milestone||sc.dur[i]===0);
   let links='';
   rows.forEach((j,vj)=>{for(const p of(T[j].preds||[])){const i=sc.ix.get(p.id);if(i==null||!rowOf.has(i))continue;const vi=rowOf.get(i);
     const crit=S.critical&&sc.crit[i]&&sc.crit[j]&&!sc.isSum[i]&&!sc.isSum[j];
-    const x1=isMs(i)?x(sc.sDN[i])+dw/2+7:x(sc.fDN[i]+1),y1=vi*RH+RH/2,x2=isMs(j)?x(sc.sDN[j])+dw/2:x(sc.sDN[j]),y2=vj*RH+RH/2;
+    const x1=isMs(i)?x(sc.sDN[i])+dw/2+8:x(sc.fDN[i]+1),y1=vi*RH+RH/2,x2=isMs(j)?x(sc.sDN[j])+dw/2:x(sc.sDN[j]),y2=vj*RH+RH/2;
     const down=vj>vi;let d,ax,ay,dir;
     const tipX=isMs(j)?x2:x2+Math.min(6,Math.max(2,(x(sc.fDN[j]+1)-x2)/2));
-    if(tipX>=x1+6){const ey=down?y2-8:y2+8;d=`M${x1} ${y1}H${tipX}V${ey}`;ax=tipX;ay=ey;dir=down?'d':'u';}
-    else{const my=down?vi*RH+RH:vi*RH;const ex=(isMs(j)?x2-7:x2)-1;d=`M${x1} ${y1}H${x1+7}V${my}H${ex-8}V${y2}H${ex}`;ax=ex;ay=y2;dir='r';}
+    if(tipX>=x1+6){const ey=down?y2-9:y2+9;d=`M${x1} ${y1}H${tipX}V${ey}`;ax=tipX;ay=ey;dir=down?'d':'u';}
+    else{const my=down?vi*RH+RH:vi*RH;const ex=(isMs(j)?x2-8:x2)-1;d=`M${x1} ${y1}H${x1+7}V${my}H${ex-8}V${y2}H${ex}`;ax=ex;ay=y2;dir='r';}
     const ah=dir==='d'?`M${ax-3.5} ${ay-4}L${ax+3.5} ${ay-4}L${ax} ${ay+1}z`:dir==='u'?`M${ax-3.5} ${ay+4}L${ax+3.5} ${ay+4}L${ax} ${ay-1}z`:`M${ax-5} ${ay-3.5}L${ax-5} ${ay+3.5}L${ax} ${ay}z`;
     links+=`<path class="lnk${crit?' crit':''}" d="${d}"/><path class="arr${crit?' crit':''}" d="${ah}"/>`;}});
   g+=links;
-  // bars
+  // bars & milestones
   const drag=S.canWrite;
   rows.forEach((i,vi)=>{
-    const t=T[i],y=vi*RH,crit=S.critical&&sc.crit[i],sel=S.sel.has(t.id);
-    const tip=`<title>${esc(t.name)}\n${fmtL(sc.sDN[i])} – ${fmtL(sc.fDN[i])} · ${fmtDur(sc.dur[i])}\n${sc.pct[i]}% complete${t.owner?' · '+esc(t.owner):''}${t.due?'\nDue '+fmtL(pISO(t.due)):''}</title>`;
+    const t=T[i],y=vi*RH,crit=S.critical&&sc.crit[i],sel=S.sel.has(t.id),ms=isMs(i);
+    const tip=`<title>${esc(t.name)}${ms?' (Milestone ◆)':''}\n${ms?fmtL(sc.sDN[i]):`${fmtL(sc.sDN[i])} – ${fmtL(sc.fDN[i])} · ${fmtDur(sc.dur[i])}`}\n${sc.pct[i]}% complete${t.owner?' · '+esc(t.owner):''}${t.notes?'\nComment: '+esc(t.notes):''}${t.due?'\nDue '+fmtL(pISO(t.due)):''}</title>`;
     const lab=t.owner?esc(t.owner):'';
     if(sc.isSum[i]){const x1=x(sc.sDN[i]),x2=x(sc.fDN[i]+1),yy=y+9;
       g+=`<g data-id="${esc(t.id)}" class="sumg">${tip}<path class="sumb${crit?' crit':''}" d="M${x1} ${yy}H${x2}V${yy+12}L${x2-5} ${yy+7}H${x1+5}L${x1} ${yy+12}Z"/>${lab?`<text class="lbl-t" x="${x2+8}" y="${y+19}">${lab}</text>`:''}</g>`;}
-    else if(sc.dur[i]===0){const cx=x(sc.sDN[i])+dw/2,cy=y+RH/2;
-      g+=`<g class="ms${crit?' crit':''}${sel?' sel':''}" data-id="${esc(t.id)}"${drag?' data-drag':''}>${tip}<path d="M${cx} ${cy-7}L${cx+7} ${cy}L${cx} ${cy+7}L${cx-7} ${cy}Z"/><text class="lbl-t" x="${cx+12}" y="${cy+4}">${fmtS(sc.sDN[i])}${lab?' · '+lab:''}</text></g>`;}
+    else if(ms){const cx=x(sc.sDN[i])+dw/2,cy=y+RH/2;
+      g+=`<g class="ms${crit?' crit':''}${sel?' sel':''}" data-id="${esc(t.id)}"${drag?' data-drag':''}>${tip}<line class="ms-line" x1="${cx}" y1="${y+1}" x2="${cx}" y2="${y+RH-1}"/><path class="ms-halo" d="M${cx} ${cy-11}L${cx+11} ${cy}L${cx} ${cy+11}L${cx-11} ${cy}Z"/><path class="ms-dia" d="M${cx} ${cy-8}L${cx+8} ${cy}L${cx} ${cy+8}L${cx-8} ${cy}Z"/><text class="lbl-ms" x="${cx+13}" y="${cy+4}">◆ ${fmtS(sc.sDN[i])}${lab?' · '+lab:''}</text></g>`;}
     else{const x1=x(sc.sDN[i]),x2=x(sc.fDN[i]+1),w=Math.max(3,x2-x1-1),yy=y+8;
       g+=`<g class="bar${crit?' crit':''}${sel?' sel':''}" data-id="${esc(t.id)}"${drag?' data-drag':''}>${tip}<rect class="tr" x="${x1}" y="${yy}" width="${w}" height="14" rx="3"/><rect class="pr" x="${x1}" y="${yy}" width="${w*sc.pct[i]/100}" height="14" rx="3"/>${drag?`<rect class="hd" x="${x1+w-5}" y="${yy-2}" width="10" height="18"/>`:''}${lab?`<text class="lbl-t" x="${x1+w+8}" y="${y+19}">${lab}</text>`:''}</g>`;}
     if(t.due){const dd=pISO(t.due),dx=x(dd+1),miss=missedDue(sc,i);g+=`<g class="due ${miss?'miss':'met'}"><title>Due ${fmtL(dd)}${miss?' — scheduled to finish late':''}</title><path d="M${dx-5} ${y+2}L${dx+5} ${y+2}L${dx} ${y+8}Z"/></g>`;}
@@ -885,27 +996,115 @@ function selectRow(id,e){
 function renderDrawer(){
   const d=$('#drawer');const ii=S.P?selIdx():[];
   if(!S.drawer||!S.P||!ii.length){d.hidden=true;d.innerHTML='';return;}
-  const i=ii[0],sc=S.sc,t=sc.T[i],sum=sc.isSum[i],ro=!S.canWrite,dis=ro?' disabled':'';
+  const i=ii[0],sc=S.sc,t=sc.T[i],sum=sc.isSum[i],isMs=!sum&&(t.milestone||sc.dur[i]===0),ro=!S.canWrite,dis=ro?' disabled':'';
   const[sl,sk]=statusOf(sc,i);
+  const atts=Array.isArray(t.attachments)?t.attachments:[];
   d.hidden=false;
-  d.innerHTML=`<header><h2>Task ${i+1}${ii.length>1?` <span style="font-weight:500;color:var(--muted);font-size:12px">(+${ii.length-1} more selected)</span>`:''}</h2><button class="btn" type="button" data-cmd="closedrawer" aria-label="Close details">${ic('x')}</button></header>
+  d.innerHTML=`<header><h2>Task ${i+1} (${esc(sc.wbs[i])})${ii.length>1?` <span style="font-weight:500;color:var(--muted);font-size:12px">(+${ii.length-1} more selected)</span>`:''}</h2><button class="btn" type="button" data-cmd="closedrawer" aria-label="Close details">${ic('x')}</button></header>
   <div class="dbody" data-id="${esc(t.id)}">
     <div class="fld full"><label for="d-name">Task name</label><input id="d-name" data-df="name" value="${esc(t.name)}"${dis}></div>
     ${sum?`<div class="fld"><label>Duration</label><div class="rov">${fmtDur(sc.dur[i])}</div></div><div class="fld"><label>% Complete</label><div class="rov">${sc.pct[i]}% (rolled up)</div></div>
       <div class="fld"><label>Start</label><div class="rov">${fmtL(sc.sDN[i])}</div></div><div class="fld"><label>Finish</label><div class="rov">${fmtL(sc.fDN[i])}</div></div>
-      <div class="fld full"><span class="hint">This is a summary task. Its dates, duration and progress roll up from its subtasks.</span></div>`
-    :`<div class="fld"><label for="d-dur">Duration</label><input id="d-dur" data-df="dur" value="${fmtDur(t.dur||0)}"${dis}></div>
-      <div class="fld"><label class="chk" style="margin-top:18px;text-transform:none;letter-spacing:0;font-size:13px;font-weight:500;color:var(--fg)"><input type="checkbox" data-df="milestone"${t.dur===0?' checked':''}${dis}> Milestone</label></div>
-      <div class="fld"><label for="d-start">Start</label><input id="d-start" type="date" data-df="start" value="${iso(sc.sDN[i])}"${dis}></div>
+      <div class="fld full"><span class="hint">This is a summary task (Outline Level ${(t.level||0)+1}). Its dates, duration and progress roll up from its subtasks.</span></div>`
+    :`<div class="fld"><label for="d-dur">Duration</label><input id="d-dur" data-df="dur" value="${fmtDur(sc.dur[i]||0)}"${dis}></div>
+      <div class="fld"><label class="chk" style="margin-top:18px;text-transform:none;letter-spacing:0;font-size:13px;font-weight:600;color:var(--fg)"><input type="checkbox" data-df="milestone"${isMs?' checked':''}${dis}> ◆ Milestone</label></div>
+      <div class="fld"><label for="d-start">${isMs?'Milestone Date':'Start'}</label><input id="d-start" type="date" data-df="start" value="${iso(sc.sDN[i])}"${dis}></div>
       <div class="fld"><label for="d-finish">Finish</label><input id="d-finish" type="date" data-df="finish" value="${iso(sc.fDN[i])}"${dis}></div>
       <div class="fld full"><label for="d-pct">% Complete — ${sc.pct[i]}%</label><input id="d-pct" type="range" min="0" max="100" step="5" data-df="pct" value="${sc.pct[i]}"${dis}></div>`}
     <div class="fld"><label for="d-due">Due date</label><input id="d-due" type="date" data-df="due" value="${esc(t.due||'')}"${dis}></div>
     <div class="fld"><label>Status</label><div class="rov"><span class="pill ${sk}">${sl}</span></div></div>
     <div class="fld full"><label for="d-owner">Responsible</label><input id="d-owner" data-df="owner" list="people" value="${esc(t.owner||'')}" placeholder="Name, or several separated by commas"${dis}></div>
     <div class="fld full"><label for="d-preds">Predecessors</label><input id="d-preds" data-df="preds" value="${esc(predsText(t,sc))}" placeholder="e.g. 3, 5+2d"${dis}><span class="hint">Row numbers this task waits for. Add a lag in working days with +2d, or overlap with -1d.${!sum&&sc.slack[i]>0?` Free to slip by ${sc.slack[i]} working day${sc.slack[i]===1?'':'s'} without moving the project finish.`:!sum?' On the critical path: any delay moves the project finish.':''}</span></div>
-    <div class="fld full"><label for="d-notes">Notes</label><textarea id="d-notes" data-df="notes"${dis}>${esc(t.notes||'')}</textarea></div>
+    <div class="fld full"><label>Attached Documents (${atts.length})</label>
+      <div class="att-list">${atts.length?atts.map(a=>`<div class="att-item"><div class="att-item-info">${ic('clip')}<a href="#" class="att-item-name" data-att-dl="${esc(a.id)}" title="Download ${esc(a.name)}">${esc(a.name)}</a><span class="att-item-meta">${fmtBytes(a.size)}</span></div>${ro?'':`<button class="btn danger" type="button" style="height:24px;padding:0 6px;font-size:11px" data-att-del="${esc(a.id)}" title="Remove attachment">${ic('trash')}</button>`}</div>`).join(''):'<span class="hint">No documents attached yet.</span>'}</div>
+      ${ro?'':`<button class="btn" type="button" data-att-add="${esc(t.id)}" style="margin-top:4px;justify-content:center">${ic('clip')}Attach document…</button>`}
+    </div>
+    <div class="fld full"><label for="d-notes">Comments</label><textarea id="d-notes" data-df="notes" placeholder="Add comments or notes for this task…"${dis}>${esc(t.notes||'')}</textarea></div>
   </div>
   <footer><button class="btn danger" type="button" data-cmd="delete"${S.canWrite?'':' disabled'}>${ic('trash')}Delete task</button><button class="btn" type="button" data-cmd="closedrawer">Done</button></footer>`;
+}
+
+/* ---------------- task attachments ---------------- */
+function readFileAsDataURL(file){
+  return new Promise((resolve,reject)=>{
+    const r=new FileReader();
+    r.onload=()=>resolve(r.result);
+    r.onerror=()=>reject(new Error('Could not read file'));
+    r.readAsDataURL(file);
+  });
+}
+async function attachFilesToTask(taskId,fileList){
+  if(!S.P||!S.canWrite||!fileList||!fileList.length)return;
+  const idx=taskIdx(taskId);if(idx<0)return;
+  const files=[...fileList];
+  const added=[];
+  for(const f of files){
+    if(f.size>12*1048576){toast(`“${f.name}” exceeds the 12 MB per-file limit.`);continue;}
+    try{
+      const dataUrl=await readFileAsDataURL(f);
+      added.push({id:'att-'+uid(),name:f.name,size:f.size,type:f.type||'application/octet-stream',dataUrl,addedAt:Date.now()});
+    }catch(e){toast(`Could not attach “${f.name}”.`);}
+  }
+  if(!added.length)return;
+  commit(()=>{
+    const t=S.P.tasks[taskIdx(taskId)];
+    if(!Array.isArray(t.attachments))t.attachments=[];
+    t.attachments.push(...added);
+  });
+  toast(`Attached ${added.length} document${added.length>1?'s':''}`);
+  if(document.querySelector('.scrim [data-att-modal]'))openAttachmentsDialog(taskId);
+}
+function downloadAttachment(taskId,attId){
+  if(!S.P)return;const idx=taskIdx(taskId);if(idx<0)return;
+  const t=S.P.tasks[idx];const att=(t.attachments||[]).find(a=>a.id===attId);
+  if(!att||!att.dataUrl)return;
+  const a=document.createElement('a');a.href=att.dataUrl;a.download=att.name||'document';
+  document.body.appendChild(a);a.click();a.remove();
+  toast(`Downloading ${att.name}`);
+}
+function deleteAttachment(taskId,attId){
+  if(!S.P||!S.canWrite)return;const idx=taskIdx(taskId);if(idx<0)return;
+  commit(()=>{
+    const t=S.P.tasks[taskIdx(taskId)];
+    t.attachments=(t.attachments||[]).filter(a=>a.id!==attId);
+  });
+  toast('Attachment removed');
+  if(document.querySelector('.scrim [data-att-modal]'))openAttachmentsDialog(taskId);
+}
+function openAttachmentsDialog(taskId){
+  if(!S.P)return;const idx=taskIdx(taskId);if(idx<0)return;
+  const t=S.P.tasks[idx],atts=Array.isArray(t.attachments)?t.attachments:[],ro=!S.canWrite;
+  modal(`<div data-att-modal="${esc(taskId)}" style="display:flex;flex-direction:column;gap:12px">
+    <h3>${ic('clip')} Documents · Task #${idx+1}: ${esc(t.name)}</h3>
+    <p>Attach project briefs, sign-off sheets, specifications or reference documents directly to this task.</p>
+    ${ro?'':`<div class="att-drop" id="attDropZone">${ic('ul')} <div style="font-weight:600;margin-top:4px">Click to choose file(s) or drag &amp; drop here</div><div style="font-size:11.5px;color:var(--faint);margin-top:2px">PDF, Word, Excel, PowerPoint, images, ZIP (up to 12 MB per file)</div></div>`}
+    <div class="att-list">${atts.length?atts.map(a=>`<div class="att-item">
+      <div class="att-item-info">${ic('clip')}<a href="#" class="att-item-name" data-att-dl="${esc(a.id)}">${esc(a.name)}</a><span class="att-item-meta">${fmtBytes(a.size)}</span></div>
+      <div style="display:flex;gap:6px">
+        <button class="btn" type="button" style="height:26px;padding:0 8px;font-size:11.5px" data-att-dl="${esc(a.id)}">${ic('dl')}Download</button>
+        ${ro?'':`<button class="btn danger" type="button" style="height:26px;padding:0 8px;font-size:11.5px" data-att-del="${esc(a.id)}" title="Delete">${ic('trash')}</button>`}
+      </div>
+    </div>`).join(''):'<div style="padding:12px;text-align:center;color:var(--faint);border:1px solid var(--line);border-radius:7px">No documents attached to this task yet.</div>'}</div>
+    <div class="acts">
+      ${ro?'':`<button class="btn primary" type="button" data-att-pick>${ic('plus')}Attach Document(s)</button>`}
+      <button class="btn" type="button" data-x>Done</button>
+    </div>
+  </div>`,s=>{
+    s.querySelector('[data-x]').onclick=closeModal;
+    const trig=()=>{S.attTaskId=taskId;$('#attIn').click();};
+    const pickBtn=s.querySelector('[data-att-pick]');if(pickBtn)pickBtn.onclick=trig;
+    const dz=s.querySelector('#attDropZone');
+    if(dz){
+      dz.onclick=trig;
+      dz.ondragover=e=>{e.preventDefault();dz.classList.add('dragover');};
+      dz.ondragleave=()=>dz.classList.remove('dragover');
+      dz.ondrop=e=>{e.preventDefault();dz.classList.remove('dragover');if(e.dataTransfer&&e.dataTransfer.files.length)attachFilesToTask(taskId,e.dataTransfer.files);};
+    }
+    s.addEventListener('click',e=>{
+      const dl=e.target.closest('[data-att-dl]');if(dl){e.preventDefault();downloadAttachment(taskId,dl.dataset.attDl);return;}
+      const del=e.target.closest('[data-att-del]');if(del){e.preventDefault();deleteAttachment(taskId,del.dataset.attDel);return;}
+    });
+  });
 }
 
 /* ---------------- UI chrome ---------------- */
@@ -969,21 +1168,25 @@ function toggleTheme(){
   lsSet('cp.theme',cur);
 }
 function sampleProgramTasks(startISO){
-  const t1=uid(),t2=uid(),t3=uid(),t4=uid(),t5=uid(),t6=uid(),t7=uid(),t8=uid(),t9=uid(),t10=uid(),t11=uid(),t12=uid(),t13=uid();
+  const t1=uid(),t1a=uid(),t2=uid(),t2b=uid(),t3=uid(),t4=uid(),t5=uid(),t6=uid(),t7=uid(),t7a=uid(),t7b=uid(),t8=uid(),t9=uid(),t10=uid(),t11=uid(),t12=uid(),t13=uid();
+  const sampleBrief='data:text/plain;charset=utf-8,'+encodeURIComponent('ACHIEVEMENT AWARDS GROUP — CHANNEL INCENTIVE PROGRAM CHARTER\n\n1. Objective: Drive Q4 partner sales velocity and tier progression.\n2. Core KPIs: Active enrolment >= 85%, target attainment +18%.\n3. Sign-Off: Approved by Executive Committee.');
   return [
-    {id:t1,name:'Program Strategy & Architecture',level:0,dur:1,start:startISO,due:null,pct:0,owner:'',preds:[],notes:'Phase 1: Commercial alignment and behavioural incentive design.'},
-    {id:t2,name:'Stakeholder discovery & commercial targets',level:1,dur:4,start:startISO,due:null,pct:100,owner:'Andrew Solomon',preds:[],notes:'Define KPIs, participant segments and baseline performance metrics.'},
-    {id:t3,name:'Behavioural diagnostic & incentive architecture',level:1,dur:5,start:startISO,due:null,pct:100,owner:'Dr. Preeya Daya',preds:[{id:t2,lag:0}],notes:'Structure earning mechanics, tier thresholds and recognition cadences.'},
-    {id:t4,name:'Executive sign-off on program mechanics',level:1,dur:0,start:startISO,due:null,pct:100,owner:'Dane Amyot',preds:[{id:t3,lag:0}],notes:'Formal approval of budget and commercial rules.'},
-    {id:t5,name:'Platform, Data & Creative Build',level:0,dur:1,start:startISO,due:null,pct:0,owner:'',preds:[],notes:'Phase 2: Brand Studio collateral and platform rules engine.'},
-    {id:t6,name:'Brand identity & campaign launch collateral',level:1,dur:6,start:startISO,due:null,pct:75,owner:'Brand Studio',preds:[{id:t4,lag:0}],notes:'Apply Achievement Awards Group brand guidelines and Clear Blue imagery.'},
-    {id:t7,name:'Platform configuration & reward rules engine',level:1,dur:8,start:startISO,due:null,pct:60,owner:'JC Latter',preds:[{id:t4,lag:0}],notes:'Configure points calculation, leaderboards and digital catalogue.'},
-    {id:t8,name:'Partner data feed & SSO integration',level:1,dur:5,start:startISO,due:null,pct:40,owner:'Data Lab',preds:[{id:t7,lag:-2}],notes:'Automated sales feed ingestion and participant authentication.'},
-    {id:t9,name:'End-to-end UAT & fulfilment verification',level:1,dur:4,start:startISO,due:null,pct:0,owner:'QA Team',preds:[{id:t6,lag:0},{id:t8,lag:0}],notes:'Verify points issuance, statements and reward redemption.'},
-    {id:t10,name:'Field Enablement & Go-Live',level:0,dur:1,start:startISO,due:null,pct:0,owner:'',preds:[],notes:'Phase 3: Regional briefings and national launch.'},
-    {id:t11,name:'Regional field manager enablement briefings',level:1,dur:3,start:startISO,due:null,pct:0,owner:'Andrew Solomon',preds:[{id:t9,lag:0}],notes:'Equip regional leads with program playbooks and target dashboards.'},
-    {id:t12,name:'Participant launch communications & teaser',level:1,dur:2,start:startISO,due:null,pct:0,owner:'Brand Studio',preds:[{id:t11,lag:0}],notes:'Deploy SMS, email and in-store launch packs.'},
-    {id:t13,name:'National Program Go-Live',level:1,dur:0,start:startISO,due:null,pct:0,owner:'JC Latter',preds:[{id:t12,lag:0}],notes:'Official launch across all participating channels.'}
+    {id:t1,name:'Program Strategy & Architecture',level:0,dur:1,start:startISO,due:null,pct:0,owner:'',preds:[],notes:'Phase 1: Commercial alignment and behavioural incentive design.',attachments:[]},
+    {id:t1a,name:'Commercial & Behavioural Discovery',level:1,dur:1,start:startISO,due:null,pct:0,owner:'Andrew Solomon',preds:[],notes:'Workstream 1.1: Stakeholder alignment & diagnostic.',attachments:[]},
+    {id:t2,name:'Stakeholder discovery & commercial targets',level:2,dur:4,start:startISO,due:null,pct:100,owner:'Andrew Solomon',preds:[],notes:'Define KPIs, participant segments and baseline performance metrics.',attachments:[{id:'att-charter',name:'AAG-Program-Charter.txt',size:248,type:'text/plain',dataUrl:sampleBrief,addedAt:Date.now()}]},
+    {id:t2b,name:'Channel partner tier modelling',level:2,dur:3,start:startISO,due:null,pct:100,owner:'Data Lab',preds:[{id:t2,lag:0}],notes:'Calibrate Gold, Platinum and Diamond threshold targets.',attachments:[]},
+    {id:t3,name:'Behavioural diagnostic & incentive architecture',level:2,dur:4,start:startISO,due:null,pct:100,owner:'Dr. Preeya Daya',preds:[{id:t2b,lag:0}],notes:'Structure earning mechanics, tier thresholds and recognition cadences.',attachments:[]},
+    {id:t4,name:'Executive sign-off on program mechanics',level:1,dur:0,milestone:true,pinDate:false,start:startISO,due:null,pct:100,owner:'Dane Amyot',preds:[{id:t3,lag:0}],notes:'Formal milestone approval of budget and commercial rules.',attachments:[]},
+    {id:t5,name:'Platform, Data & Creative Build',level:0,dur:1,start:startISO,due:null,pct:0,owner:'',preds:[],notes:'Phase 2: Brand Studio collateral and platform rules engine.',attachments:[]},
+    {id:t6,name:'Brand identity & campaign launch collateral',level:1,dur:6,start:startISO,due:null,pct:75,owner:'Brand Studio',preds:[{id:t4,lag:0}],notes:'Apply Achievement Awards Group brand guidelines and Clear Blue imagery.',attachments:[]},
+    {id:t7,name:'Platform & Data Integration Workstream',level:1,dur:1,start:startISO,due:null,pct:0,owner:'JC Latter',preds:[],notes:'Workstream 2.2: Rules engine, catalogue and partner SSO feeds.',attachments:[]},
+    {id:t7a,name:'Platform configuration & reward rules engine',level:2,dur:6,start:startISO,due:null,pct:65,owner:'JC Latter',preds:[{id:t4,lag:0}],notes:'Configure points calculation, leaderboards and digital catalogue.',attachments:[]},
+    {id:t8,name:'Partner data feed & SSO integration',level:2,dur:5,start:startISO,due:null,pct:40,owner:'Data Lab',preds:[{id:t7a,lag:-2}],notes:'Automated sales feed ingestion and participant authentication.',attachments:[]},
+    {id:t9,name:'End-to-end UAT & fulfilment verification',level:1,dur:4,start:startISO,due:null,pct:0,owner:'QA Team',preds:[{id:t6,lag:0},{id:t8,lag:0}],notes:'Verify points issuance, statements and reward redemption.',attachments:[]},
+    {id:t10,name:'Field Enablement & Go-Live',level:0,dur:1,start:startISO,due:null,pct:0,owner:'',preds:[],notes:'Phase 3: Regional briefings and national launch.',attachments:[]},
+    {id:t11,name:'Regional field manager enablement briefings',level:1,dur:3,start:startISO,due:null,pct:0,owner:'Andrew Solomon',preds:[{id:t9,lag:0}],notes:'Equip regional leads with program playbooks and target dashboards.',attachments:[]},
+    {id:t12,name:'Participant launch communications & teaser',level:1,dur:2,start:startISO,due:null,pct:0,owner:'Brand Studio',preds:[{id:t11,lag:0}],notes:'Deploy SMS, email and in-store launch packs.',attachments:[]},
+    {id:t13,name:'National Program Go-Live',level:1,dur:0,milestone:true,pinDate:false,start:startISO,due:null,pct:0,owner:'JC Latter',preds:[{id:t12,lag:0}],notes:'Official launch milestone across all participating channels.',attachments:[]}
   ];
 }
 async function loadSampleProgram(){
@@ -1021,9 +1224,9 @@ function columnsMenu(anchor){
 const xe=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]));
 function csvCell(v){v=String(v==null?'':v);return/[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}
 function buildCSV(){
-  const sc=sched(S.P),T=sc.T;const head=['ID','Outline Level','Name','Duration','Start','Finish','Deadline','% Complete','Resource Names','Predecessors','Status','Notes'];
+  const sc=sched(S.P),T=sc.T;const head=['ID','Outline Level','WBS','Name','Duration','Start','Finish','Deadline','% Complete','Resource Names','Predecessors','Status','Attachments','Comments'];
   const lines=[head.join(',')];
-  T.forEach((t,i)=>lines.push([i+1,t.level+1,t.name,fmtDur(sc.dur[i]),iso(sc.sDN[i]),iso(sc.fDN[i]),t.due||'',sc.pct[i],t.owner||'',predsText(t,sc),statusOf(sc,i)[0],t.notes||''].map(csvCell).join(',')));
+  T.forEach((t,i)=>lines.push([i+1,t.level+1,sc.wbs[i],t.name,fmtDur(sc.dur[i]),iso(sc.sDN[i]),iso(sc.fDN[i]),t.due||'',sc.pct[i],t.owner||'',predsText(t,sc),statusOf(sc,i)[0],(t.attachments||[]).map(a=>a.name).join('; '),t.notes||''].map(csvCell).join(',')));
   return'﻿'+lines.join('\r\n');
 }
 function buildXML(){
@@ -1091,25 +1294,26 @@ function buildXLSX(){
 
   const rowsXml=[];
   // Row 1: Brand Title Banner
-  rowsXml.push(`<row r="1" ht="28" customHeight="1">${xlCell(1,1,'ACHIEVEMENT AWARDS GROUP · CRITICAL PATH PROGRAM PLAN',1)}${Array.from({length:13},(_,k)=>xlCell(k+2,1,'',1)).join('')}</row>`);
+  rowsXml.push(`<row r="1" ht="28" customHeight="1">${xlCell(1,1,'ACHIEVEMENT AWARDS GROUP · CRITICAL PATH PROGRAM PLAN',1)}${Array.from({length:15},(_,k)=>xlCell(k+2,1,'',1)).join('')}</row>`);
   // Row 2: Project KPI Summary
-  rowsXml.push(`<row r="2" ht="22" customHeight="1">${xlCell(1,2,'Project:',2)}${xlCell(2,2,P.name||'Untitled',3)}${xlCell(3,2,'Start Date:',2)}${xlCell(4,2,P.start||'',3)}${xlCell(5,2,'Finish Date:',2)}${xlCell(6,2,fin,3)}${xlCell(7,2,'Duration:',2)}${xlCell(8,2,dur,3)}${xlCell(9,2,'Complete:',2)}${xlCell(10,2,pct+'%',3)}${xlCell(11,2,'Tasks Done:',2)}${xlCell(12,2,`${done} / ${cnt}`,3)}${xlCell(13,2,'Critical Tasks:',2)}${xlCell(14,2,critCnt,3,true)}</row>`);
+  rowsXml.push(`<row r="2" ht="22" customHeight="1">${xlCell(1,2,'Project:',2)}${xlCell(2,2,P.name||'Untitled',3)}${xlCell(3,2,'Start Date:',2)}${xlCell(4,2,P.start||'',3)}${xlCell(5,2,'Finish Date:',2)}${xlCell(6,2,fin,3)}${xlCell(7,2,'Duration:',2)}${xlCell(8,2,dur,3)}${xlCell(9,2,'Complete:',2)}${xlCell(10,2,pct+'%',3)}${xlCell(11,2,'Tasks Done:',2)}${xlCell(12,2,`${done} / ${cnt}`,3)}${xlCell(13,2,'Critical Tasks:',2)}${xlCell(14,2,critCnt,3,true)}${xlCell(15,2,'',3)}${xlCell(16,2,'',3)}</row>`);
   // Row 3: Spacer
   rowsXml.push(`<row r="3" ht="10" customHeight="1"/>`);
   // Row 4: Table Header
-  const headers=['#','Outline Level','Task Name','Type','Duration (Days)','Start Date','Finish Date','Due Date','% Complete','Responsible','Predecessors','Critical Path','Slack (Days)','Status','Notes'];
+  const headers=['#','Outline Level','Task Name','Type','Duration (Days)','Start Date','Finish Date','Due Date','% Complete','Responsible','Predecessors','Critical Path','Slack (Days)','Status','Attachments','Comments'];
   rowsXml.push(`<row r="4" ht="24" customHeight="1">${headers.map((h,idx)=>xlCell(idx+1,4,h,4)).join('')}</row>`);
   // Rows 5+: Tasks
   T.forEach((t,i)=>{
-    const r=i+5,sum=sc.isSum[i],ms=!sum&&sc.dur[i]===0,crit=!sum&&sc.crit[i];
+    const r=i+5,sum=sc.isSum[i],ms=!sum&&(t.milestone||sc.dur[i]===0),crit=!sum&&sc.crit[i];
     const [statLabel,statKind]=statusOf(sc,i);
     const st=sum?5:crit?7:statKind==='done'?8:6;
     const indent='   '.repeat(t.level||0);
-    const typeStr=sum?'Summary':ms?'Milestone':'Task';
+    const typeStr=sum?'Summary':ms?'Milestone (◆)':'Task';
+    const attNames=Array.isArray(t.attachments)&&t.attachments.length?t.attachments.map(a=>a.name).join(', '):'';
     const cells=[
       xlCell(1,r,i+1,st,true),
-      xlCell(2,r,(t.level||0)+1,st,true),
-      xlCell(3,r,indent+t.name,st),
+      xlCell(2,r,sc.wbs[i]||String((t.level||0)+1),st),
+      xlCell(3,r,indent+(ms?'◆ ':'')+t.name,st),
       xlCell(4,r,typeStr,st),
       xlCell(5,r,sc.dur[i],st,true),
       xlCell(6,r,iso(sc.sDN[i]),st),
@@ -1121,18 +1325,19 @@ function buildXLSX(){
       xlCell(12,r,sc.crit[i]?'Yes':'No',st),
       xlCell(13,r,sum?'':sc.slack[i],st,!sum),
       xlCell(14,r,statLabel,st),
-      xlCell(15,r,t.notes||'',st)
+      xlCell(15,r,attNames,st),
+      xlCell(16,r,t.notes||'',st)
     ];
     rowsXml.push(`<row r="${r}" ht="20" customHeight="1">${cells.join('')}</row>`);
   });
 
-  const colWidths=[6,13,38,12,15,13,13,13,13,22,15,13,13,14,36];
+  const colWidths=[6,13,40,14,15,13,13,13,13,22,15,13,13,14,24,40];
   const colsXml=`<cols>${colWidths.map((w,idx)=>`<col min="${idx+1}" max="${idx+1}" width="${w}" customWidth="1"/>`).join('')}</cols>`;
   const sheetXml=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
   ${colsXml}
   <sheetData>${rowsXml.join('')}</sheetData>
-  <mergeCells count="1"><mergeCell ref="A1:O1"/></mergeCells>
+  <mergeCells count="1"><mergeCell ref="A1:P1"/></mergeCells>
 </worksheet>`;
 
   const stylesXml=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -1213,7 +1418,7 @@ function buildPDF(){
   const finStr=cnt?fmtM(dnOf(hi)):'-',durStr=cnt?(hi-lo+1)+' working days':'0 days';
   const gLo=Math.min(lo,todayDN)-3,gHi=Math.max(hi,todayDN)+5,gSpan=Math.max(7,gHi-gLo+1);
 
-  const PW=842,PH=595,M=24,TW=456,GX=M+TW,GW=PW-M-GX;
+  const PW=842,PH=595,M=24,TW=522,GX=M+TW,GW=PW-M-GX;
   const gx=dn=>GX+clamp((dn-gLo)/gSpan,0,1)*GW;
   const ROWS_PER_PAGE=16;
   const totalPages=Math.max(1,Math.ceil(T.length/ROWS_PER_PAGE));
@@ -1282,16 +1487,17 @@ function buildPDF(){
     line(GX,BY,GX,TY);
 
     const cols=[
-      {x:M+6,lbl:'#'},
-      {x:M+24,lbl:'TASK NAME'},
-      {x:M+198,lbl:'DUR'},
-      {x:M+230,lbl:'START'},
-      {x:M+284,lbl:'FINISH'},
-      {x:M+338,lbl:'%'},
-      {x:M+364,lbl:'RESPONSIBLE'},
-      {x:M+418,lbl:'STATUS'}
+      {x:M+4,lbl:'WBS'},
+      {x:M+28,lbl:'TASK NAME'},
+      {x:M+168,lbl:'DUR'},
+      {x:M+194,lbl:'START'},
+      {x:M+236,lbl:'FINISH'},
+      {x:M+278,lbl:'%'},
+      {x:M+300,lbl:'RESPONSIBLE'},
+      {x:M+358,lbl:'STATUS'},
+      {x:M+398,lbl:'COMMENTS'}
     ];
-    cols.forEach(c=>txt(c.x,TY-15,c.lbl,'F2',7,78,86,102));
+    cols.forEach(c=>txt(c.x,TY-15,c.lbl,'F2',6.8,78,86,102));
 
     // Gantt Timescale Header ticks (weekly / step ticks)
     const stepDays=gSpan>60?14:gSpan>25?7:3;
@@ -1309,7 +1515,7 @@ function buildPDF(){
     slice.forEach((t,idx)=>{
       const i=pg*ROWS_PER_PAGE+idx;
       const ry=TY-TH-(idx+1)*RH0;
-      const sum=sc.isSum[i],ms=!sum&&sc.dur[i]===0,crit=!sum&&sc.crit[i];
+      const sum=sc.isSum[i],ms=!sum&&(t.milestone||sc.dur[i]===0),crit=!sum&&sc.crit[i];
       const [statLbl,statKey]=statusOf(sc,i);
 
       if(sum){fill(244,246,251);rect(M,ry,PW-2*M,RH0,'f');}
@@ -1319,30 +1525,35 @@ function buildPDF(){
       line(M,ry,PW-M,ry);
 
       const ty=ry+7.5;
-      const fnt=sum||crit?'F2':'F1';
+      const fnt=sum||crit||ms?'F2':'F1';
       const [tr,tg,tb]=crit?[187,29,94]:[10,22,46];
 
-      txt(M+6,ty,String(i+1),'F1',7.5,118,121,128);
-      const indentX=M+24+Math.min(t.level||0,4)*8;
-      const maxChars=Math.max(14,31-(t.level||0)*2);
-      txt(indentX,ty,truncStr(t.name,maxChars),fnt,8,tr,tg,tb);
-      txt(M+198,ty,sc.dur[i]+'d',sum?'F2':'F1',7.5,10,22,46);
-      txt(M+230,ty,fmtS(sc.sDN[i]),'F1',7.5,78,86,102);
-      txt(M+284,ty,fmtS(sc.fDN[i]),'F1',7.5,78,86,102);
-      txt(M+338,ty,sc.pct[i]+'%',sum?'F2':'F1',7.5,10,22,46);
-      txt(M+364,ty,truncStr(t.owner||'',10),'F1',7.5,78,86,102);
+      txt(M+4,ty,truncStr(sc.wbs[i]||String(i+1),5),'F1',6.8,118,121,128);
+      const indentX=M+28+Math.min(t.level||0,5)*6;
+      const maxChars=Math.max(12,25-(t.level||0)*2);
+      const attCnt=Array.isArray(t.attachments)?t.attachments.length:0;
+      const taskTitle=(ms?'<> ':'')+t.name+(attCnt?` [${attCnt}f]`:'');
+      txt(indentX,ty,truncStr(taskTitle,maxChars),fnt,7.5,tr,tg,tb);
+      txt(M+168,ty,ms?'0d':sc.dur[i]+'d',sum||ms?'F2':'F1',7.2,10,22,46);
+      txt(M+194,ty,fmtS(sc.sDN[i]),'F1',7,78,86,102);
+      txt(M+236,ty,fmtS(sc.fDN[i]),'F1',7,78,86,102);
+      txt(M+278,ty,sc.pct[i]+'%',sum?'F2':'F1',7,10,22,46);
+      txt(M+300,ty,truncStr(t.owner||'',10),'F1',7,78,86,102);
 
       // Status Pill
-      const px=M+416,py=ry+5,pw0=36,ph0=11;
+      const px=M+356,py=ry+5,pw0=36,ph0=11;
       if(statKey==='done')fill(236,246,212);
       else if(statKey==='late')fill(252,230,238);
       else if(statKey==='ok')fill(226,232,247);
       else fill(240,242,245);
       rect(px,py,pw0,ph0,'f');
       const [sr,sg,sb]=statKey==='done'?[44,107,29]:statKey==='late'?[187,29,94]:statKey==='ok'?[33,64,154]:[100,108,120];
-      txt(px+3,py+3,truncStr(statLbl,7),'F2',6.2,sr,sg,sb);
+      txt(px+3,py+3,truncStr(statLbl,7),'F2',6,sr,sg,sb);
 
-      // Gantt Bar
+      // Comments Column
+      txt(M+398,ty,truncStr(t.notes||'',26),'F1',6.8,78,86,102);
+
+      // Gantt Bar / Milestone Diamond
       const x1=gx(sc.sDN[i]),x2=gx(sc.fDN[i]+1),bw=Math.max(4,x2-x1);
       if(sum){
         fill(10,22,46);
@@ -1351,8 +1562,9 @@ function buildPDF(){
         rect(x1+bw-2.5,ry+8,2.5,5,'f');
       }else if(ms){
         const cx=gx(sc.sDN[i]+0.5),cy=ry+11;
-        if(crit)fill(187,29,94);else fill(10,22,46);
-        ops.push(`${cx.toFixed(2)} ${(cy+4.5).toFixed(2)} m ${(cx+4.5).toFixed(2)} ${cy.toFixed(2)} l ${cx.toFixed(2)} ${(cy-4.5).toFixed(2)} l ${(cx-4.5).toFixed(2)} ${cy.toFixed(2)} l f`);
+        if(crit)fill(187,29,94);else fill(33,64,154);
+        ops.push(`${cx.toFixed(2)} ${(cy+5).toFixed(2)} m ${(cx+5).toFixed(2)} ${cy.toFixed(2)} l ${cx.toFixed(2)} ${(cy-5).toFixed(2)} l ${(cx-5).toFixed(2)} ${cy.toFixed(2)} l f`);
+        txt(cx+7,ry+8,fmtS(sc.sDN[i]),'F2',6.2,33,64,154);
       }else{
         if(crit)fill(242,197,205);else fill(184,199,236);
         rect(x1,ry+6.5,bw,9,'f');
@@ -1363,7 +1575,7 @@ function buildPDF(){
           stroke(187,29,94);ops.push('0.8 w');rect(x1,ry+6.5,bw,9,'S');
         }
       }
-      if(t.owner&&x1+bw+4<PW-M-24){
+      if(!ms&&t.owner&&x1+bw+4<PW-M-24){
         txt(x1+bw+4,ry+8,truncStr(t.owner,14),'F1',6.5,100,108,120);
       }
     });
@@ -1473,20 +1685,20 @@ function fromCSV(text){
   const c={id:find('id','#','unique id'),lvl:find('outline level','level'),name:find('name','task name','task'),dur:find('duration','duration (days)'),
     start:find('start','start date','start_date'),fin:find('finish','finish date','end','end date'),due:find('deadline','due','due date'),
     pct:find('% complete','percent complete','% complete (%)','complete','progress'),own:find('resource names','responsible','owner','assigned to','resource','resources'),
-    pred:find('predecessors','depends on'),notes:find('notes')};
+    pred:find('predecessors','depends on'),notes:find('comments','comment','notes','note')};
   if(c.name<0)throw new Error('Couldn’t find a “Name” or “Task Name” column.');
   const tasks=[],idMap=new Map(),rawPreds=[];
   rows.slice(1).forEach((r,k)=>{const g=i=>i>=0?(r[i]||'').trim():'';const name=g(c.name);if(!name)return;
     const s=parseAnyDate(g(c.start)),f=parseAnyDate(g(c.fin));let dur=parseDur(g(c.dur).replace(/\?$/,'').replace(/\s*e?days?$/i,'d').replace(/\s+/,''));
     if(dur==null&&s!=null&&f!=null)dur=Math.max(1,finWD(f)-wd(s)+1);if(dur==null)dur=1;
-    const t={id:uid(),name,level:Math.max(0,(parseInt(g(c.lvl),10)||1)-1),dur,start:s!=null?iso(dnOf(wd(s))):null,due:(()=>{const d=parseAnyDate(g(c.due));return d!=null?iso(d):null;})(),
-      pct:clamp(parseInt(g(c.pct),10)||0,0,100),owner:g(c.own).replace(/\[[^\]]*\]/g,'').trim(),preds:[],notes:g(c.notes)};
+    const t={id:uid(),name,level:clamp((parseInt(g(c.lvl),10)||1)-1,0,MAX_LEVEL),dur,milestone:dur===0,pinDate:dur===0&&s!=null,start:s!=null?iso(dur===0?s:dnOf(wd(s))):null,due:(()=>{const d=parseAnyDate(g(c.due));return d!=null?iso(d):null;})(),
+      pct:clamp(parseInt(g(c.pct),10)||0,0,100),owner:g(c.own).replace(/\[[^\]]*\]/g,'').trim(),preds:[],notes:g(c.notes),attachments:[]};
     tasks.push(t);idMap.set(g(c.id)||String(tasks.length),t);rawPreds.push(g(c.pred));});
   fixLevels(tasks);
   tasks.forEach((t,i)=>{if(!rawPreds[i])return;const txt=rawPreds[i].replace(/\s*e?days?/gi,'d').replace(/\s*e?wks?|\s*weeks?/gi,'w');const r=parsePreds(txt,tasks,t.id,idMap);if(r.list)t.preds=r.list;});
   return{tasks};
 }
-function fixLevels(tasks){let prev=-1;tasks.forEach(t=>{if(t.level>prev+1)t.level=prev+1;prev=t.level;});}
+function fixLevels(tasks){let prev=-1;tasks.forEach(t=>{t.level=clamp(t.level|0,0,MAX_LEVEL);if(t.level>prev+2)t.level=prev+2;if(prev<0)t.level=0;prev=t.level;});}
 function fromXML(text){
   const doc=new DOMParser().parseFromString(text,'application/xml');if(doc.getElementsByTagName('parsererror').length)throw new Error('That XML file could not be read.');
   const ch=(el,tag)=>{for(const c of el.children)if(c.localName===tag)return c;return null;};const tv=(el,tag)=>{const c=ch(el,tag);return c?c.textContent.trim():'';};
@@ -1509,7 +1721,7 @@ async function importFile(file){
   const text=await file.text();let r;const nm=file.name.replace(/\.[^.]+$/,'');
   try{
     if(/\.json$/i.test(file.name)||/^\s*\{/.test(text)){const o=JSON.parse(text);if(!Array.isArray(o.tasks))throw new Error('This JSON file has no task list.');
-      r={name:o.name,start:o.start,tasks:o.tasks.map(t=>({id:String(t.id||uid()),name:String(t.name||'Untitled task'),level:Math.max(0,t.level|0),dur:Math.max(0,t.dur|0),start:t.start||null,due:t.due||null,pct:clamp(t.pct|0,0,100),owner:String(t.owner||''),preds:Array.isArray(t.preds)?t.preds.map(p=>({id:String(p.id),lag:p.lag|0})):[],notes:String(t.notes||''),collapsed:!!t.collapsed}))};fixLevels(r.tasks);}
+      r={name:o.name,start:o.start,tasks:o.tasks.map(t=>({id:String(t.id||uid()),name:String(t.name||'Untitled task'),level:clamp(t.level|0,0,MAX_LEVEL),dur:Math.max(0,t.dur|0),milestone:!!(t.milestone||(t.dur|0)===0),pinDate:!!t.pinDate,start:t.start||null,due:t.due||null,pct:clamp(t.pct|0,0,100),owner:String(t.owner||''),preds:Array.isArray(t.preds)?t.preds.map(p=>({id:String(p.id),lag:p.lag|0})):[],notes:String(t.notes||t.comments||''),attachments:Array.isArray(t.attachments)?t.attachments:[],collapsed:!!t.collapsed}))};fixLevels(r.tasks);}
     else if(/\.xml$/i.test(file.name)||/^\s*</.test(text))r=fromXML(text);
     else r=fromCSV(text);
   }catch(e){toast(e.message||'That file could not be imported.');return;}
@@ -1556,6 +1768,7 @@ function bind(){
   $('#saveStat').onclick=()=>dbSettingsDialog();
   $('#projSel').onchange=e=>{if(S.dirty)flush();openProject(e.target.value);};
   $('#fileIn').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)importFile(f);};
+  $('#attIn').onchange=e=>{const fl=e.target.files;if(fl&&fl.length&&S.attTaskId)attachFilesToTask(S.attTaskId,[...fl]);e.target.value='';};
   document.addEventListener('click',e=>{
     if(popEl&&!popEl.contains(e.target)&&!e.target.closest('[data-cmd=columns],#moreBtn'))closePop();
     const b=e.target.closest('[data-cmd]');if(b&&!b.disabled){if(b.dataset.cmd==='columns'&&popEl){closePop();return;}cmd(b.dataset.cmd,b,e);}
@@ -1577,6 +1790,13 @@ function bind(){
   gbody.addEventListener('click',e=>{
     const a=e.target.closest('[data-act]');if(!a)return;const row=a.closest('.row[data-id]');if(!row)return;const id=row.dataset.id;
     if(a.dataset.act==='toggle')toggleCollapse(id);
+    else if(a.dataset.act==='att'){selectRow(id,e);openAttachmentsDialog(id);}
+    else if(a.dataset.act==='ms-toggle'){
+      const i=taskIdx(id);if(i<0||S.sc.isSum[i])return;
+      const t=S.P.tasks[i],wasMs=t.milestone||S.sc.dur[i]===0;
+      setField(id,'milestone',!wasMs);
+      toast(!wasMs?`Converted “${t.name}” to Milestone (◆) on ${fmtM(S.sc.sDN[i])}`:`Converted “${t.name}” back to regular task`);
+    }
     else if(a.dataset.act==='sel'){if(!e.shiftKey&&!e.ctrlKey&&!e.metaKey&&S.sel.size===1&&S.sel.has(id)){S.drawer=true;renderDrawer();}else selectRow(id,e);}
   });
   gbody.addEventListener('keydown',e=>{
@@ -1591,6 +1811,12 @@ function bind(){
   const dr=$('#drawer');
   dr.addEventListener('change',e=>{const f=e.target.dataset.df;if(!f)return;const id=dr.querySelector('.dbody').dataset.id;setField(id,f,f==='milestone'?e.target.checked:e.target.value);});
   dr.addEventListener('input',e=>{if(e.target.dataset.df==='pct'){const l=e.target.previousElementSibling;if(l)l.textContent='% Complete — '+e.target.value+'%';}});
+  dr.addEventListener('click',e=>{
+    const db=dr.querySelector('.dbody');if(!db)return;const tid=db.dataset.id;
+    const addBtn=e.target.closest('[data-att-add]');if(addBtn){S.attTaskId=tid;$('#attIn').click();return;}
+    const dlBtn=e.target.closest('[data-att-dl]');if(dlBtn){e.preventDefault();downloadAttachment(tid,dlBtn.dataset.attDl);return;}
+    const delBtn=e.target.closest('[data-att-del]');if(delBtn){e.preventDefault();deleteAttachment(tid,delBtn.dataset.attDel);return;}
+  });
   // scroll sync
   const gB=$('#ganttBody'),gH=$('#ganttHead'),rH=$('#gridHead');
   gbody.addEventListener('scroll',()=>{rH.scrollLeft=gbody.scrollLeft;if(gB.scrollTop!==gbody.scrollTop)gB.scrollTop=gbody.scrollTop;},{passive:true});
@@ -1606,20 +1832,23 @@ function bind(){
   gB.addEventListener('pointermove',e=>{
     if(!drag||e.pointerId!==drag.pid)return;const dx=e.clientX-drag.x0;if(!drag.moved&&Math.abs(dx)<4)return;
     if(!drag.moved){drag.moved=true;drag.g.classList.add('dragging');tipEl=document.createElement('div');tipEl.className='drag-tip';document.body.appendChild(tipEl);}
-    const sc=S.sc,i=drag.i,days=Math.round(dx/S.g.dw);drag.days=days;
+    const sc=S.sc,i=drag.i,t=sc.T[i],isMs=!sc.isSum[i]&&(t.milestone||sc.dur[i]===0),days=Math.round(dx/S.g.dw);drag.days=days;
     let s=sc.sDN[i],f=sc.fDN[i];
-    if(drag.mode==='move'){s=dnOf(wd(s+days));f=sc.dur[i]?dnOf(wd(s)+sc.dur[i]-1):s;drag.g.setAttribute('transform',`translate(${(s-sc.sDN[i])*S.g.dw},0)`);}
+    if(drag.mode==='move'){s=isMs?(s+days):dnOf(wd(s+days));f=sc.dur[i]?dnOf(wd(s)+sc.dur[i]-1):s;drag.g.setAttribute('transform',`translate(${(s-sc.sDN[i])*S.g.dw},0)`);}
     else{const fw=Math.max(sc.Sw[i],finWD(sc.fDN[i]+days));f=dnOf(fw);const w=Math.max(3,S.g.x(f+1)-S.g.x(s)-1);
       drag.g.querySelector('.tr').setAttribute('width',w);drag.g.querySelector('.pr').setAttribute('width',w*sc.pct[i]/100);}
-    tipEl.textContent=`${fmtL(s)} → ${fmtL(f)} · ${fmtDur(drag.mode==='move'?sc.dur[i]:wd(f)-sc.Sw[i]+1)}`;
+    tipEl.textContent=isMs?`◆ Milestone: ${fmtL(s)}`:`${fmtL(s)} → ${fmtL(f)} · ${fmtDur(drag.mode==='move'?sc.dur[i]:wd(f)-sc.Sw[i]+1)}`;
     tipEl.style.left=Math.min(window.innerWidth-260,e.clientX+14)+'px';tipEl.style.top=(e.clientY+18)+'px';
   });
   const endDrag=e=>{
     if(!drag||e.pointerId!==drag.pid)return;const d=drag;drag=null;if(tipEl){tipEl.remove();tipEl=null;}
     if(!d.moved){selectRow(d.id,d.ev);return;}
-    d.g.classList.remove('dragging');const sc=S.sc,i=d.i,t=S.P.tasks[i];
+    d.g.classList.remove('dragging');const sc=S.sc,i=d.i,t=S.P.tasks[i],isMs=!sc.isSum[i]&&(t.milestone||sc.dur[i]===0);
     if(e.type==='pointercancel'||!d.days){render();return;}
-    if(d.mode==='move'){const ns=dnOf(wd(sc.sDN[i]+d.days));commit(()=>{t.start=iso(ns);});if((t.preds||[]).length&&ns<sc.sDN[i])toast('This task cannot start before the tasks it depends on finish.');}
+    if(d.mode==='move'){
+      if(isMs){const ns=sc.sDN[i]+d.days;commit(()=>{t.start=iso(ns);t.dur=0;t.milestone=true;t.pinDate=true;});}
+      else{const ns=dnOf(wd(sc.sDN[i]+d.days));commit(()=>{t.start=iso(ns);});if((t.preds||[]).length&&ns<sc.sDN[i])toast('This task cannot start before the tasks it depends on finish.');}
+    }
     else{const fw=Math.max(sc.Sw[i],finWD(sc.fDN[i]+d.days));commit(()=>{t.dur=Math.max(1,fw-sc.Sw[i]+1);});}
     S.sel=new Set([d.id]);S.anchor=d.id;
   };
@@ -1751,13 +1980,14 @@ async function createPersistentDB(){
     S.dbTier='IndexedDB + Browser Storage';
   }
 
-  // Seed default Achievement Awards Group sample program on very first boot if empty
-  if(!Object.keys(merged).length&&!lsGet('cp.seeded',false)){
-    lsSet('cp.seeded',true);
+  // Seed default Achievement Awards Group sample program on very first boot if empty, or upgrade untouched seed to v2
+  const needSeed=(!Object.keys(merged).length&&!lsGet('cp.seeded',false))||(merged['p-aag-launch']&&(merged['p-aag-launch'].rev||0)<=2&&!lsGet('cp.seededV2',false));
+  if(needSeed){
+    lsSet('cp.seeded',true);lsSet('cp.seededV2',true);
     const start=iso(dnOf(wd(todayDN-7)));
     const seedId='p-aag-launch';
     S.critical=true;lsSet('cp.crit',true);
-    const seedDoc=docBody({name:'Channel Incentive Program Launch',start,tasks:sampleProgramTasks(start),rev:1});
+    const seedDoc=docBody({name:'Channel Incentive Program Launch',start,tasks:sampleProgramTasks(start),rev:3});
     merged[seedId]=seedDoc;
     await idbPut(idb,seedId,seedDoc);
     if(useServerAPI){

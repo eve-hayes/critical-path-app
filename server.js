@@ -53,7 +53,7 @@ function collectBody(req) {
     let body = '';
     req.on('data', chunk => {
       body += chunk;
-      if (body.length > 5e6) {
+      if (body.length > 50e6) {
         reject(new Error('Payload too large'));
         req.destroy();
       }
