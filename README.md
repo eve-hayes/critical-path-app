@@ -1,6 +1,9 @@
 # Critical Path · Achievement Awards Group
 
-A branded project and program planner with tasks and indented subtasks, durations, start, finish and due dates, `% complete`, responsible people, predecessors, critical path, and a live interactive Gantt chart.
+**Live Production App (Vercel):** https://critical-path-app.vercel.app/  
+**Direct HTML Link:** https://critical-path-app.vercel.app/index.html
+
+A branded project and program planner with tasks and multi-level indented subtasks, document attachments, milestones (`◆`), durations, start, finish and due dates, `% complete`, responsible people, predecessors, comments, critical path, native Excel (`.xlsx`) & PDF (`.pdf`) exports, and a live interactive Gantt chart.
 
 ## Brand Identity (`aagroup.co.za/brand`)
 
